@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/wikipedia-separation.iml" filepath="$PROJECT_DIR$/.idea/modules/wikipedia-separation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/wikipedia-separation_main.iml" filepath="$PROJECT_DIR$/.idea/modules/wikipedia-separation_main.iml" group="wikipedia-separation" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/wikipedia-separation_test.iml" filepath="$PROJECT_DIR$/.idea/modules/wikipedia-separation_test.iml" group="wikipedia-separation" />
+    </modules>
+  </component>
+</project>
