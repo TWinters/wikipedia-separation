@@ -104,4 +104,4 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
-*.sql
+src/main/resources/raw/
