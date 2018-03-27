@@ -1,0 +1,1 @@
+SELECT l.pl_from AS from_id, p.page_id AS to_id FROM pagelinks AS l INNER JOIN page AS p ON p.page_title=l.pl_title WHERE pl_from=5 ORDER BY pl_from;
