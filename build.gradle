@@ -12,6 +12,8 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile 'com.google.guava:guava:11.0.2'
-    compile 'com.sparkjava:spark-core:2.0.0'
     compile 'org.slf4j:slf4j-nop:1.7.25'
+    compile 'com.sparkjava:spark-core:2.0.0'
+    compile 'org.apache.spark:spark-core_2.10:1.6.1'
+    compile 'org.apache.spark:spark-graphx_2.11:2.3.0'
 }
