@@ -2,6 +2,8 @@ package be.kuleuven.alsn;
 
 import static spark.Spark.get;
 
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.neo4j.driver.v1.AuthTokens;
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.GraphDatabase;
@@ -27,7 +29,7 @@ public class HelloWorld implements AutoCloseable
         driver.close();
     }
 
-    public void printGreeting( final String message )
+        public void printGreeting( final String message )
     {
         try ( Session session = driver.session() )
         {
@@ -53,5 +55,13 @@ public class HelloWorld implements AutoCloseable
         {
             greeter.printGreeting( "hello, world" );
         }
+
+        SparkConf conf = new SparkConf();
+        conf.setAppName("HelloWorld");
+        //conf.set("spark.neo4j.bolt.password=<password>", "password");
+        conf.setMaster("bolt://host:7687");
+        conf.set("spark.neo4j.bolt.user", "neo4j");
+        conf.set("spark.neo4j.bolt.password", "password");
+        JavaSparkContext sc = new JavaSparkContext(conf);
     }
 }

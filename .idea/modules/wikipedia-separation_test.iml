@@ -36,9 +36,9 @@
     <orderEntry type="library" name="Gradle: org.apache.curator:curator-framework:2.6.0" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.curator:curator-client:2.6.0" level="project" />
     <orderEntry type="library" name="Gradle: com.google.guava:guava:16.0.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-nop:1.7.25" level="project" />
     <orderEntry type="library" name="Gradle: com.sparkjava:spark-core:2.0.0" level="project" />
-    <orderEntry type="library" name="Gradle: org.neo4j.driver:neo4j-java-driver:1.4.4" level="project" />
+    <orderEntry type="library" name="Gradle: neo4j-contrib:neo4j-spark-connector:2.1.0-M4" level="project" />
+    <orderEntry type="library" name="Gradle: org.neo4j.driver:neo4j-java-driver:1.5.0" level="project" />
     <orderEntry type="library" name="Gradle: junit:junit:4.12" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.spark:spark-network-shuffle_2.10:1.6.1" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.spark:spark-network-common_2.10:1.6.1" level="project" />
@@ -54,6 +54,8 @@
     <orderEntry type="library" name="Gradle: org.apache.avro:avro-ipc:tests:1.7.7" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.spark:spark-mllib-local_2.11:2.3.0" level="project" />
     <orderEntry type="library" name="Gradle: org.scalanlp:breeze_2.11:0.13.2" level="project" />
+    <orderEntry type="library" name="Gradle: graphframes:graphframes:0.5.0-spark2.1-s_2.11" level="project" />
+    <orderEntry type="library" name="Gradle: com.typesafe.scala-logging:scala-logging-slf4j_2.11:2.1.2" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:jul-to-slf4j:1.7.16" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:jcl-over-slf4j:1.7.16" level="project" />
     <orderEntry type="library" name="Gradle: io.dropwizard.metrics:metrics-jvm:3.1.5" level="project" />
@@ -67,7 +69,7 @@
     <orderEntry type="library" name="Gradle: org.apache.zookeeper:zookeeper:3.4.6" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:slf4j-log4j12:1.7.16" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.avro:avro:1.7.7" level="project" />
-    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.25" level="project" />
+    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.16" level="project" />
     <orderEntry type="library" name="Gradle: org.eclipse.jetty:jetty-webapp:9.0.2.v20130417" level="project" />
     <orderEntry type="library" name="Gradle: org.eclipse.jetty:jetty-servlet:9.0.2.v20130417" level="project" />
     <orderEntry type="library" name="Gradle: org.eclipse.jetty:jetty-security:9.0.2.v20130417" level="project" />
@@ -96,6 +98,7 @@
     <orderEntry type="library" name="Gradle: org.json4s:json4s-core_2.10:3.2.10" level="project" />
     <orderEntry type="library" name="Gradle: org.json4s:json4s-jackson_2.11:3.2.11" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.module:jackson-module-scala_2.11:2.6.7.1" level="project" />
+    <orderEntry type="library" name="Gradle: com.typesafe.scala-logging:scala-logging-api_2.11:2.1.2" level="project" />
     <orderEntry type="library" name="Gradle: org.json4s:json4s-ast_2.10:3.2.10" level="project" />
     <orderEntry type="library" name="Gradle: org.json4s:json4s-core_2.11:3.2.11" level="project" />
     <orderEntry type="library" name="Gradle: org.scalanlp:breeze-macros_2.11:0.13.2" level="project" />
@@ -107,9 +110,9 @@
     <orderEntry type="library" name="Gradle: org.typelevel:macro-compat_2.11:1.1.1" level="project" />
     <orderEntry type="library" name="Gradle: org.scala-lang:scalap:2.11.0" level="project" />
     <orderEntry type="library" name="Gradle: org.scala-lang:scala-compiler:2.11.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.scala-lang:scala-reflect:2.11.8" level="project" />
     <orderEntry type="library" name="Gradle: org.scala-lang.modules:scala-xml_2.11:1.0.1" level="project" />
     <orderEntry type="library" name="Gradle: org.scala-lang.modules:scala-parser-combinators_2.11:1.0.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.scala-lang:scala-reflect:2.11.8" level="project" />
     <orderEntry type="library" name="Gradle: org.scala-lang:scala-library:2.11.8" level="project" />
     <orderEntry type="library" name="Gradle: com.sun.jersey.contribs:jersey-guice:1.9" level="project" />
     <orderEntry type="library" name="Gradle: com.sun.jersey:jersey-server:1.9" level="project" />
