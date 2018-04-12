@@ -34,7 +34,7 @@ public class HelloWorld implements AutoCloseable {
         }
     }
 
-    public static void connect(String user, String password) throws Exception {
+    public static JavaSparkContext connect(String user, String password) throws Exception {
         try (HelloWorld greeter = new HelloWorld("bolt://localhost:7687", user, password)) {
             greeter.printGreeting("hello, world");
         }
@@ -46,7 +46,7 @@ public class HelloWorld implements AutoCloseable {
         conf.set("spark.neo4j.bolt.user", user);
         conf.set("spark.neo4j.bolt.password", password);
         JavaSparkContext sc = new JavaSparkContext(conf);
-
+        return sc;
     }
 
     public static void main(String... args) throws Exception {
@@ -54,6 +54,6 @@ public class HelloWorld implements AutoCloseable {
             throw new IllegalArgumentException("Please provide a login for the neo4j database as command line arguments, in the format [login-name] [password]");
         }
 
-        connect(args[0], args[1]);
+        JavaSparkContext sc = connect(args[0], args[1]);
     }
 }
