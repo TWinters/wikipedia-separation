@@ -3,6 +3,7 @@ package be.kuleuven.alsn;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.neo4j.driver.v1.*;
+import org.neo4j.spark.Neo4JavaSparkContext;
 
 import static org.neo4j.driver.v1.Values.parameters;
 
@@ -39,13 +40,17 @@ public class HelloWorld implements AutoCloseable {
             greeter.printGreeting("hello, world");
         }
 
-        SparkConf conf = new SparkConf();
-        conf.setAppName("HelloWorld");
-        //conf.set("spark.neo4j.bolt.password=<password>", "password");
-        conf.setMaster("bolt://host:7687");
-        conf.set("spark.neo4j.bolt.user", user);
-        conf.set("spark.neo4j.bolt.password", password);
+        SparkConf conf = new SparkConf()
+                .setAppName("HelloWorldTestApp")
+                .setMaster("local[*]")
+                .set("spark.driver.allowMultipleContexts", "true")
+                .set("spark.neo4j.bolt.user", user)
+                .set("spark.neo4j.bolt.password", password)
+                .set("spark.neo4j.bolt.url", "bolt://host:7687");
         JavaSparkContext sc = new JavaSparkContext(conf);
+        Neo4JavaSparkContext csc = Neo4JavaSparkContext.neo4jContext(sc);
+
+
         return sc;
     }
 
