@@ -1,14 +1,6 @@
-package be.kuleuven.alsn;
+package be.kuleuven.alsn.sandbox;
 
-import org.neo4j.driver.internal.InternalNode;
-import org.neo4j.graphdb.Node;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.neo4j.driver.v1.*;
-
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import static org.neo4j.driver.v1.Values.parameters;
 
