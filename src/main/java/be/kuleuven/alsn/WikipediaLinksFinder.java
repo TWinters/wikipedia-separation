@@ -4,6 +4,7 @@ import com.google.protobuf.Internal;
 import org.neo4j.driver.internal.InternalPath;
 import org.neo4j.driver.v1.*;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -41,6 +42,7 @@ public class WikipediaLinksFinder implements AutoCloseable {
         }
     }
 
+    // TODO: Optimaliseerbaar door gebruik van volgende query: 'MATCH (s) WHERE ID(s) in [19, 3309035] RETURN ID(s),s.title' voor meerdere nodes
     private static final String nodeNameQuery = "MATCH (s) WHERE ID(s) = $id RETURN s.title";
     public String getNodeName(final long nodeId) {
         try (Session session = driver.session()) {
@@ -60,13 +62,16 @@ public class WikipediaLinksFinder implements AutoCloseable {
 
 
     public String printTransactionResult(StatementResult result) {
-        StringBuilder b = new StringBuilder();
+        // Using a set to filter out duplicate paths (due to duplicate IDs for pages)
+        HashSet<List<String>> paths = new HashSet<>();
+
+        // For all found shortest paths
         for (Record rec : result.list()) {
             rec.asMap().forEach((key, value) -> {
-                b.append(convertPathToList((InternalPath) value).stream().collect(Collectors.joining(" -> "))+"\n");
+                paths.add(convertPathToList((InternalPath) value));
             });
         }
-        return b.toString();
+        return paths.stream().map(List::toString).collect(Collectors.joining("\n"));
     }
 
     public List<String> convertPathToList(InternalPath path) {
