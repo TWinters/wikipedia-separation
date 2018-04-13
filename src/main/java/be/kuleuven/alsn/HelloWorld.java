@@ -40,32 +40,6 @@ public class HelloWorld implements AutoCloseable {
         }
     }
 
-    public void runTestQuery(final String query) {
-        try (Session session = driver.session()) {
-            String result = session.writeTransaction(new TransactionWork<String>() {
-                @Override
-                public String execute(Transaction tx) {
-                    StatementResult result = tx.run(query,
-                            parameters());
-
-                    return printTransactionResult(result);
-                }
-            });
-            System.out.println(result);
-        }
-    }
-
-    public String printTransactionResult(StatementResult result) {
-    StringBuilder b = new StringBuilder();
-        for (Record rec : result.list()) {
-            rec.asMap().forEach((key, value) -> {
-                b.append(key + " -> " + value + "\n");
-            });
-        }
-        return b.toString();
-    }
-
-
     public static void connect(String user, String password) throws Exception {
 //        SparkConf conf = new SparkConf()
 //                .setAppName("HelloWorldTestApp")
@@ -81,8 +55,7 @@ public class HelloWorld implements AutoCloseable {
 
 //        Neo4jGraph.loadGraph(sc.sc(), "MATCH (n:Page) RETURN n LIMIT 25", )
         HelloWorld greeter = new HelloWorld("bolt://localhost:7687", user, password);
-//        greeter.printGreeting("RESULT: " + found.toString());
-        greeter.runTestQuery("MATCH (n:Page) RETURN n.title LIMIT 25");
+        greeter.printGreeting("Hello, world");
 
     }
 
