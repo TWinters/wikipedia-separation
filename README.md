@@ -72,3 +72,21 @@ LOAD CSV FROM 'file:///page_links.csv' AS line
 MATCH (page1:Page{id: toInteger(line[0])}),(page2:Page{id: toInteger(line[1])})
 CREATE (page1)-[:REFERENCES_TO]->(page2)
 ```
+
+## Running the program
+
+### Basic shortest path between pages
+To find the shortest path between two wikipedia pages, the class `WikipediaLinksFinder` can be run.
+This program requires several arguments given with the command line, namely:
+
+| Argument               | Description               |
+| ---------------------- | ------------------------- |
+| -db_url | The url where the Neo4J database containing the Wikipedia links is running. Default value: `bolt://localhost:7687` |
+| -db_login | The login name of the Neo4J database. |
+| -db_pw | The password of the Neo4J database. |
+| -from | The Wikipedia page to start from. |
+| -to | The goal Wikipedia page to end on and find the shortest path to.  |
+| ---------------------- | ------------------------- |
+
+For example, possible program arguments are:
+`-db_login neo4j -db_pw admin -from Katholieke_Universiteit_Leuven -to Adolf_Hitler`
