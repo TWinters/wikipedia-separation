@@ -1,6 +1,12 @@
 package be.kuleuven.alsn;
 
+import com.google.protobuf.Internal;
+import org.neo4j.driver.internal.InternalPath;
 import org.neo4j.driver.v1.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static org.neo4j.driver.v1.Values.parameters;
 
@@ -27,6 +33,7 @@ public class WikipediaLinksFinder implements AutoCloseable {
                     StatementResult result = tx.run(shortestPathQuery,
                             parameters("from", from, "to", to));
 
+
                     return printTransactionResult(result);
                 }
             });
@@ -34,14 +41,36 @@ public class WikipediaLinksFinder implements AutoCloseable {
         }
     }
 
+    private static final String nodeNameQuery = "MATCH (s) WHERE ID(s) = $id RETURN s.title";
+    public String getNodeName(final long nodeId) {
+        try (Session session = driver.session()) {
+            String result = session.writeTransaction(new TransactionWork<String>() {
+                @Override
+                public String execute(Transaction tx) {
+                    StatementResult result = tx.run(nodeNameQuery,
+                            parameters("id", nodeId));
+
+
+                    return result.single().get(0).asString();
+                }
+            });
+            return result;
+        }
+    }
+
+
     public String printTransactionResult(StatementResult result) {
         StringBuilder b = new StringBuilder();
         for (Record rec : result.list()) {
             rec.asMap().forEach((key, value) -> {
-                b.append(key + " -> " + value + "\n");
+                b.append(convertPathToList((InternalPath) value).stream().collect(Collectors.joining(" -> "))+"\n");
             });
         }
         return b.toString();
+    }
+
+    public List<String> convertPathToList(InternalPath path) {
+        return StreamSupport.stream(path.nodes().spliterator(),false).map(e->getNodeName(e.id())).collect(Collectors.toList());
     }
 
     public static void main(String... args) throws Exception {
