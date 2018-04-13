@@ -1,6 +1,6 @@
 package be.kuleuven.alsn;
 
-import be.kuleuven.alsn.data.LinksFinderArguments;
+import be.kuleuven.alsn.arguments.LinksFinderArguments;
 import com.beust.jcommander.JCommander;
 import org.neo4j.driver.internal.InternalPath;
 import org.neo4j.driver.v1.*;
@@ -28,29 +28,26 @@ public class WikipediaLinksFinder implements AutoCloseable {
     private static final String shortestPathQuery = "MATCH (begin:Page { title: $from }),(end:Page { title: $to }), p = shortestPath((begin)-[:REFERENCES_TO*]->(end)) RETURN p";
 
     public void findShortestPath(final String from, final String to) {
-        try (Session session = driver.session()) {
-            HashSet<List<String>> shortestPaths =
-                    session.writeTransaction(tx -> {
-                        StatementResult statementResult = tx.run(shortestPathQuery,
-                                parameters("from", from, "to", to));
-                        return extractPathsFromStatementResult(statementResult);
-                    });
-            System.out.println(shortestPaths.stream().map(list -> list.stream().collect(Collectors.joining(" -> "))).collect(Collectors.joining("\n")));
-        }
+        HashSet<List<String>> shortestPaths =
+                extractPathsFromStatementResult(
+                        driver.session().writeTransaction(tx ->
+                                tx.run(shortestPathQuery, parameters("from", from, "to", to))));
+        System.out.println(
+                shortestPaths.stream().
+                        map(list -> list.stream().
+                                collect(Collectors.joining(" -> "))).
+                        collect(Collectors.joining("\n")));
+
     }
 
     // TODO: Optimaliseerbaar door gebruik van volgende query: 'MATCH (s) WHERE ID(s) in [19, 3309035] RETURN ID(s),s.title' voor meerdere nodes
     private static final String nodeNameQuery = "MATCH (s) WHERE ID(s) = $id RETURN s.title";
 
     private String getNodeName(final long nodeId) {
-        try (Session session = driver.session()) {
-            String result = session.writeTransaction(tx -> {
-                StatementResult result1 = tx.run(nodeNameQuery,
-                        parameters("id", nodeId));
-                return result1.single().get(0).asString();
-            });
-            return result;
-        }
+        return driver.session()
+                .writeTransaction(tx ->
+                        tx.run(nodeNameQuery, parameters("id", nodeId)))
+                .single().get(0).asString();
     }
 
 
