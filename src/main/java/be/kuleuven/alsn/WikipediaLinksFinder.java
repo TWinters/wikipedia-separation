@@ -1,6 +1,7 @@
 package be.kuleuven.alsn;
 
-import com.google.protobuf.Internal;
+import be.kuleuven.alsn.data.LinksFinderArguments;
+import com.beust.jcommander.JCommander;
 import org.neo4j.driver.internal.InternalPath;
 import org.neo4j.driver.v1.*;
 
@@ -24,7 +25,7 @@ public class WikipediaLinksFinder implements AutoCloseable {
         driver.close();
     }
 
-    private static final String shortestPathQuery ="MATCH (begin:Page { title: $from }),(end:Page { title: $to }), p = shortestPath((begin)-[:REFERENCES_TO*]->(end)) RETURN p";
+    private static final String shortestPathQuery = "MATCH (begin:Page { title: $from }),(end:Page { title: $to }), p = shortestPath((begin)-[:REFERENCES_TO*]->(end)) RETURN p";
 
     public void findShortestPath(final String from, final String to) {
         try (Session session = driver.session()) {
@@ -44,6 +45,7 @@ public class WikipediaLinksFinder implements AutoCloseable {
 
     // TODO: Optimaliseerbaar door gebruik van volgende query: 'MATCH (s) WHERE ID(s) in [19, 3309035] RETURN ID(s),s.title' voor meerdere nodes
     private static final String nodeNameQuery = "MATCH (s) WHERE ID(s) = $id RETURN s.title";
+
     public String getNodeName(final long nodeId) {
         try (Session session = driver.session()) {
             String result = session.writeTransaction(new TransactionWork<String>() {
@@ -75,15 +77,19 @@ public class WikipediaLinksFinder implements AutoCloseable {
     }
 
     public List<String> convertPathToList(InternalPath path) {
-        return StreamSupport.stream(path.nodes().spliterator(),false).map(e->getNodeName(e.id())).collect(Collectors.toList());
+        return StreamSupport.stream(path.nodes().spliterator(), false).map(e -> getNodeName(e.id())).collect(Collectors.toList());
     }
 
     public static void main(String... args) throws Exception {
-        if (args.length < 2) {
-            throw new IllegalArgumentException("Please provide a login for the neo4j database as command line arguments, in the format [login-name] [password]");
-        }
+        LinksFinderArguments arguments = new LinksFinderArguments();
 
-        WikipediaLinksFinder finder = new WikipediaLinksFinder("bolt://localhost:7687", args[0], args[1]);
-        finder.findShortestPath("Yoctogram", "Adolf_Hitler");
+        JCommander.newBuilder()
+                .addObject(arguments)
+                .build()
+                .parse(args);
+
+
+        WikipediaLinksFinder finder = new WikipediaLinksFinder(arguments.getDatabaseUrl(), arguments.getLogin(), arguments.getPassword());
+        finder.findShortestPath(arguments.getFrom(), arguments.getTo());
     }
 }

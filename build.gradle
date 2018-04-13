@@ -26,5 +26,7 @@ dependencies {
     compile group: 'org.neo4j', name: 'neo4j-kernel', version: '3.3.4'
     testCompile group: 'org.neo4j', name: 'neo4j-common', version: '3.3.4'
 
+    compile group: 'com.beust', name: 'jcommander', version: '1.72'
+
 
 }

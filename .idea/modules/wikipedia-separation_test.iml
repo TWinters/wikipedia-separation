@@ -64,6 +64,7 @@
     <orderEntry type="library" name="Gradle: org.scala-lang:scala-library:2.11.8" level="project" />
     <orderEntry type="library" name="Gradle: org.neo4j.driver:neo4j-java-driver:1.5.0" level="project" />
     <orderEntry type="library" name="Gradle: org.neo4j:neo4j-kernel:3.3.4" level="project" />
+    <orderEntry type="library" name="Gradle: com.beust:jcommander:1.72" level="project" />
     <orderEntry type="library" name="Gradle: junit:junit:4.12" level="project" />
     <orderEntry type="library" name="Gradle: org.neo4j:neo4j-configuration:3.3.4" level="project" />
     <orderEntry type="library" name="Gradle: org.neo4j:neo4j-ssl:3.3.4" level="project" />
