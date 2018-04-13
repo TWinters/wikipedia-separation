@@ -29,54 +29,44 @@ public class WikipediaLinksFinder implements AutoCloseable {
 
     public void findShortestPath(final String from, final String to) {
         try (Session session = driver.session()) {
-            String result = session.writeTransaction(new TransactionWork<String>() {
-                @Override
-                public String execute(Transaction tx) {
-                    StatementResult result = tx.run(shortestPathQuery,
-                            parameters("from", from, "to", to));
-
-
-                    return printTransactionResult(result);
-                }
-            });
-            System.out.println(result);
+            HashSet<List<String>> shortestPaths =
+                    session.writeTransaction(tx -> {
+                        StatementResult statementResult = tx.run(shortestPathQuery,
+                                parameters("from", from, "to", to));
+                        return extractPathsFromStatementResult(statementResult);
+                    });
+            System.out.println(shortestPaths.stream().map(list -> list.stream().collect(Collectors.joining(" -> "))).collect(Collectors.joining("\n")));
         }
     }
 
     // TODO: Optimaliseerbaar door gebruik van volgende query: 'MATCH (s) WHERE ID(s) in [19, 3309035] RETURN ID(s),s.title' voor meerdere nodes
     private static final String nodeNameQuery = "MATCH (s) WHERE ID(s) = $id RETURN s.title";
 
-    public String getNodeName(final long nodeId) {
+    private String getNodeName(final long nodeId) {
         try (Session session = driver.session()) {
-            String result = session.writeTransaction(new TransactionWork<String>() {
-                @Override
-                public String execute(Transaction tx) {
-                    StatementResult result = tx.run(nodeNameQuery,
-                            parameters("id", nodeId));
-
-
-                    return result.single().get(0).asString();
-                }
+            String result = session.writeTransaction(tx -> {
+                StatementResult result1 = tx.run(nodeNameQuery,
+                        parameters("id", nodeId));
+                return result1.single().get(0).asString();
             });
             return result;
         }
     }
 
 
-    public String printTransactionResult(StatementResult result) {
+    private HashSet<List<String>> extractPathsFromStatementResult(StatementResult result) {
         // Using a set to filter out duplicate paths (due to duplicate IDs for pages)
         HashSet<List<String>> paths = new HashSet<>();
 
         // For all found shortest paths
         for (Record rec : result.list()) {
-            rec.asMap().forEach((key, value) -> {
-                paths.add(convertPathToList((InternalPath) value));
-            });
+            rec.asMap().forEach((key, value) ->
+                    paths.add(convertPathToList((InternalPath) value)));
         }
-        return paths.stream().map(List::toString).collect(Collectors.joining("\n"));
+        return paths;
     }
 
-    public List<String> convertPathToList(InternalPath path) {
+    private List<String> convertPathToList(InternalPath path) {
         return StreamSupport.stream(path.nodes().spliterator(), false).map(e -> getNodeName(e.id())).collect(Collectors.toList());
     }
 
