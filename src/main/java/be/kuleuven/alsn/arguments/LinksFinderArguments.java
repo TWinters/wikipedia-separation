@@ -1,4 +1,4 @@
-package be.kuleuven.alsn.data;
+package be.kuleuven.alsn.arguments;
 
 import com.beust.jcommander.Parameter;
 
