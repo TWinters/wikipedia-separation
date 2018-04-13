@@ -1,8 +1,14 @@
 package be.kuleuven.alsn;
 
-import org.apache.spark.SparkConf;
+import org.neo4j.driver.internal.InternalNode;
+import org.neo4j.graphdb.Node;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.neo4j.driver.v1.*;
+
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static org.neo4j.driver.v1.Values.parameters;
 
@@ -34,23 +40,50 @@ public class HelloWorld implements AutoCloseable {
         }
     }
 
-    public static JavaSparkContext connect(String user, String password) throws Exception {
-        try (HelloWorld greeter = new HelloWorld("bolt://localhost:7687", user, password)) {
-            greeter.printGreeting("hello, world");
+    public void runTestQuery(final String query) {
+        try (Session session = driver.session()) {
+            String result = session.writeTransaction(new TransactionWork<String>() {
+                @Override
+                public String execute(Transaction tx) {
+                    StatementResult result = tx.run(query,
+                            parameters());
+
+                    return printTransactionResult(result);
+                }
+            });
+            System.out.println(result);
         }
+    }
 
-        SparkConf conf = new SparkConf()
-                .setAppName("HelloWorldTestApp")
-                .setMaster("local[*]")
-                .set("spark.driver.allowMultipleContexts", "true")
-                .set("spark.neo4j.bolt.user", user)
-                .set("spark.neo4j.bolt.password", password)
-                .set("spark.neo4j.bolt.url", "bolt://host:7687");
-        JavaSparkContext sc = new JavaSparkContext(conf);
+    public String printTransactionResult(StatementResult result) {
+    StringBuilder b = new StringBuilder();
+        for (Record rec : result.list()) {
+            rec.asMap().forEach((key, value) -> {
+                b.append(key + " -> " + value + "\n");
+            });
+        }
+        return b.toString();
+    }
+
+
+    public static void connect(String user, String password) throws Exception {
+//        SparkConf conf = new SparkConf()
+//                .setAppName("HelloWorldTestApp")
+//                .setMaster("local[*]")
+//                .set("spark.driver.allowMultipleContexts", "true")
+//                .set("spark.neo4j.bolt.user", user)
+//                .set("spark.neo4j.bolt.password", password)
+//                .set("spark.neo4j.bolt.url", "bolt://host:7687");
+//        JavaSparkContext sc = new JavaSparkContext(conf);
 //        Neo4JavaSparkContext csc = Neo4JavaSparkContext.neo4jContext(sc);
+//        JavaRDD<Map<String, Object>> found = csc.query("MATCH (n:Page) RETURN n LIMIT 25", new HashMap<>());
+//        System.out.println("RESULT: " + found.collect().stream().map(Object::toString).collect(Collectors.joining("\n")));
 
+//        Neo4jGraph.loadGraph(sc.sc(), "MATCH (n:Page) RETURN n LIMIT 25", )
+        HelloWorld greeter = new HelloWorld("bolt://localhost:7687", user, password);
+//        greeter.printGreeting("RESULT: " + found.toString());
+        greeter.runTestQuery("MATCH (n:Page) RETURN n.title LIMIT 25");
 
-        return sc;
     }
 
     public static void main(String... args) throws Exception {
@@ -58,6 +91,6 @@ public class HelloWorld implements AutoCloseable {
             throw new IllegalArgumentException("Please provide a login for the neo4j database as command line arguments, in the format [login-name] [password]");
         }
 
-        JavaSparkContext sc = connect(args[0], args[1]);
+        connect(args[0], args[1]);
     }
 }
