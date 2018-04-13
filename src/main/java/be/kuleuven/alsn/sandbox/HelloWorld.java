@@ -16,17 +16,14 @@ public class HelloWorld implements AutoCloseable {
         driver.close();
     }
 
-    public void printGreeting(final String message) {
+    public void addAndPrintGreeting(final String message) {
         try (Session session = driver.session()) {
-            String greeting = session.writeTransaction(new TransactionWork<String>() {
-                @Override
-                public String execute(Transaction tx) {
-                    StatementResult result = tx.run("CREATE (a:Greeting) " +
-                                    "SET a.message = $message " +
-                                    "RETURN a.message + ', from node ' + id(a)",
-                            parameters("message", message));
-                    return result.single().get(0).asString();
-                }
+            String greeting = session.writeTransaction(tx -> {
+                StatementResult result = tx.run("CREATE (a:Greeting) " +
+                                "SET a.message = $message " +
+                                "RETURN a.message + ', from node ' + id(a)",
+                        parameters("message", message));
+                return result.single().get(0).asString();
             });
             System.out.println(greeting);
         }
@@ -47,7 +44,7 @@ public class HelloWorld implements AutoCloseable {
 
 //        Neo4jGraph.loadGraph(sc.sc(), "MATCH (n:Page) RETURN n LIMIT 25", )
         HelloWorld greeter = new HelloWorld("bolt://localhost:7687", user, password);
-        greeter.printGreeting("Hello, world");
+        greeter.addAndPrintGreeting("Hello, world");
 
     }
 
