@@ -1,6 +1,9 @@
 package be.kuleuven.alsn.sandbox;
 
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.neo4j.driver.v1.*;
+import org.neo4j.spark.Neo4JavaSparkContext;
 
 import static org.neo4j.driver.v1.Values.parameters;
 
@@ -30,21 +33,17 @@ public class HelloWorld implements AutoCloseable {
     }
 
     public static void connect(String user, String password) throws Exception {
-//        SparkConf conf = new SparkConf()
-//                .setAppName("HelloWorldTestApp")
-//                .setMaster("local[*]")
-//                .set("spark.driver.allowMultipleContexts", "true")
-//                .set("spark.neo4j.bolt.user", user)
-//                .set("spark.neo4j.bolt.password", password)
-//                .set("spark.neo4j.bolt.url", "bolt://host:7687");
-//        JavaSparkContext sc = new JavaSparkContext(conf);
-//        Neo4JavaSparkContext csc = Neo4JavaSparkContext.neo4jContext(sc);
+        SparkConf conf = new SparkConf()
+                .setAppName("HelloWorldTestApp")
+                .setMaster("local[*]")
+                .set("spark.driver.allowMultipleContexts", "true")
+                .set("spark.neo4j.bolt.user", user)
+                .set("spark.neo4j.bolt.password", password)
+                .set("spark.neo4j.bolt.url", "bolt://host:7687");
+        JavaSparkContext sc = new JavaSparkContext(conf);
+        Neo4JavaSparkContext csc = Neo4JavaSparkContext.neo4jContext(sc);
 //        JavaRDD<Map<String, Object>> found = csc.query("MATCH (n:Page) RETURN n LIMIT 25", new HashMap<>());
 //        System.out.println("RESULT: " + found.collect().stream().map(Object::toString).collect(Collectors.joining("\n")));
-
-//        Neo4jGraph.loadGraph(sc.sc(), "MATCH (n:Page) RETURN n LIMIT 25", )
-        HelloWorld greeter = new HelloWorld("bolt://localhost:7687", user, password);
-        greeter.addAndPrintGreeting("Hello, world");
 
     }
 
