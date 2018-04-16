@@ -42,11 +42,11 @@ public class HelloWorld implements AutoCloseable {
     public static void connect(String user, String password) throws Exception {
         SparkConf conf = new SparkConf()
                 .setAppName("HelloWorldTestApp")
-                .setMaster("local")
+                .setMaster("local[*]")
                 .set("spark.driver.allowMultipleContexts", "true")
                 .set("spark.neo4j.bolt.user", user)
                 .set("spark.neo4j.bolt.password", password)
-                .set("spark.neo4j.bolt.url", "bolt://host:7687");
+                .set("spark.neo4j.bolt.url", "bolt://localhost:7687");
         JavaSparkContext sc = new JavaSparkContext(conf);
         Neo4JavaSparkContext csc = Neo4JavaSparkContext.neo4jContext(sc);
         JavaRDD<Map<String, Object>> found = csc.query(nodeNameQuery, new HashMap<>());
