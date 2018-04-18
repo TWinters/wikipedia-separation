@@ -16,27 +16,49 @@ This program is used to create the CSV file required by the graph database.
 
 #### Converting the Wikipedia datadump
 
-Go to any wikimedia datadump of wikipedia, e.g. the [Dutch March 20th 2018 wikipedia datadump](https://dumps.wikimedia.org/nlwiki/20180320/), and download *name-date*-nlwiki-20180320-page_props.sql.gz as well as *name-date*-nlwiki-20180320-pagelinks.sql.gz.
-These two files are SQL data containing information about which page id has a reference to what other page title, as well as what page id corresponds to which page title.
+Go to any wikimedia datadump of wikipedia, e.g. the [Dutch March 20th 2018 wikipedia datadump](https://dumps.wikimedia.org/nlwiki/20180320/), and download *name-date*-nlwiki-20180320-page.sql.gz as well as *name-date*-nlwiki-20180320-pagelinks.sql.gz.
+These two files are SQL data containing information about which page id has a reference to what other page title (pagelinks table), as well as what page id corresponds to which page title (page table).
 
 These files have to be converted to CSV files in order to be loaded into Neo4J.
-To create the right CSV files, import both SQL files into a MySQL database, and use a program such as MySQL Workbench to run the following query:
-Note: the *outfile* location might need to be updated depending on where your MySQL database has access to files.
+To create the right CSV files, import both SQL files into a MySQL database, and use a program such as MySQL Workbench.
+
+Because the page table contains a lot of duplicates and redundant tables, this table has to be filtered first.
+Use the following queries to do this with *$SCHEME_NAME* the chosen name for the scheme:
+```
+CREATE TABLE $SCHEME_NAME.page_filtered AS
+    SELECT p.page_id, p.page_title
+    FROM $SCHEME_NAME.page AS p
+    WHERE p.page_is_redirect = 0
+        AND p.page_namespace = 0;
+ALTER TABLE $SCHEME_NAME.page_filtered ADD PRIMARY KEY (page_id);
+
+```
+The last query makes a primary key of the page ID. 
+
+Once the table page_filtered has been made, it is advised to add an index on page_title as this will speed up the following
+queries significantly. To add the index use the following query:
+```
+ALTER TABLE $SCHEME_NAME.page_filtered ADD INDEX(page_title);
+```
+
+With the added index, a clean table containing all links can now be made. In order to store this table, the CSV format is used.
+Use the following query to make the table and to store it in a CSV file.
+Note: the *outfile* location might need to be updated depending on where your MySQL database has access to files 
 
 ```
 SELECT l.pl_from AS from_id, p.page_id AS to_id
-INTO OUTFILE 'c:/wamp/tmp/page_links.csv'
+INTO OUTFILE 'C:/ProgramData/MySQL/MySQL Server 5.7/Uploads/page_links.csv'
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 ESCAPED BY '\\'
 LINES TERMINATED BY '\n'
-FROM pagelinks AS l
-INNER JOIN page AS p ON p.page_title=l.pl_title
+FROM nlwiki.pagelinks AS l
+INNER JOIN $SCHEME_NAME.page_filtered AS p ON p.page_title=l.pl_title
 ```
-
+Then use the following query to store the page titles in CSV format:
 ```
-SELECT page_id, page_title FROM `wikipedia-links`.page
-INTO OUTFILE 'c:/wamp/tmp/page_titles.csv'
+SELECT page_id, page_title FROM $SCHEME_NAME.page
+INTO OUTFILE 'C:/ProgramData/MySQL/MySQL Server 5.7/Uploads/page_titles.csv'
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 ESCAPED BY '\\'
