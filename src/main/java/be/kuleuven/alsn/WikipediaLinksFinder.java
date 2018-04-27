@@ -1,6 +1,7 @@
 package be.kuleuven.alsn;
 
 import be.kuleuven.alsn.arguments.LinksFinderArguments;
+import be.kuleuven.alsn.arguments.Neo4jConnectionDetails;
 import be.kuleuven.alsn.data.WikipediaPageCard;
 import be.kuleuven.alsn.data.WikipediaPath;
 import com.beust.jcommander.JCommander;
@@ -72,16 +73,18 @@ public class WikipediaLinksFinder implements AutoCloseable {
     }
 
     public static void main(String... args) throws Exception {
-        LinksFinderArguments arguments = new LinksFinderArguments();
+        Neo4jConnectionDetails neo4jArguments = new Neo4jConnectionDetails();
+        LinksFinderArguments linkArguments = new LinksFinderArguments();
 
         JCommander.newBuilder()
-                .addObject(arguments)
+                .addObject(neo4jArguments)
+                .addObject(linkArguments)
                 .build()
                 .parse(args);
 
 
-        WikipediaLinksFinder finder = new WikipediaLinksFinder(arguments.getDatabaseUrl(), arguments.getLogin(), arguments.getPassword());
-        System.out.println(finder.findShortestPath(arguments.getFrom(), arguments.getTo())
+        WikipediaLinksFinder finder = new WikipediaLinksFinder(neo4jArguments.getDatabaseUrl(), neo4jArguments.getLogin(), neo4jArguments.getPassword());
+        System.out.println(finder.findShortestPath(linkArguments.getFrom(), linkArguments.getTo())
                 .stream().map(WikipediaPath::toString)
                 .collect(Collectors.joining("\n")));
     }
