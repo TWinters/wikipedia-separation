@@ -1,9 +1,10 @@
 package be.kuleuven.alsn.gui;
 
-import be.kuleuven.alsn.facade.ILinksFinderFacade;
+import be.kuleuven.alsn.data.WikipediaPath;
+import be.kuleuven.alsn.facade.IWikipediaSeperationFacade;
 
 import javax.swing.*;
-import java.util.List;
+import java.util.Collection;
 
 public class WikipediaSeperationGUI {
     private JTextField txtFrom;
@@ -16,9 +17,9 @@ public class WikipediaSeperationGUI {
     private JPanel mainPanel;
 
     //region Initialisation
-    private final ILinksFinderFacade facade;
+    private final IWikipediaSeperationFacade facade;
 
-    public WikipediaSeperationGUI(ILinksFinderFacade facade) {
+    public WikipediaSeperationGUI(IWikipediaSeperationFacade facade) {
         this.facade = facade;
         btnCalculateShortestPath.addActionListener(x -> calculateShortestPath());
         btnToBlacklist.addActionListener(x -> addSelectionToBlacklist());
@@ -31,7 +32,7 @@ public class WikipediaSeperationGUI {
         String from = txtFrom.getText();
         String to = txtTo.getText();
 
-        List<String> path = facade.calculateShortestPath(from, to);
+        Collection<WikipediaPath> path = facade.calculateShortestPath(from, to);
 
     }
     //end region
