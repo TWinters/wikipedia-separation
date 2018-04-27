@@ -15,6 +15,10 @@ public class WikipediaSeperationGUI {
     private JButton btnToWhiteList;
     private JButton btnCalculateShortestPath;
     private JPanel mainPanel;
+    private JTextField txtNeo4jUsername;
+    private JTextField txtNeo4jURI;
+    private JPasswordField txtNeo4jPassword;
+    private JButton updateConnectionButton;
 
     //region Initialisation
     private final IWikipediaSeperationFacade facade;
@@ -24,6 +28,15 @@ public class WikipediaSeperationGUI {
         btnCalculateShortestPath.addActionListener(x -> calculateShortestPath());
         btnToBlacklist.addActionListener(x -> addSelectionToBlacklist());
         btnToWhiteList.addActionListener(x -> addSelectionToWhitelist());
+        updateConnectionButton.addActionListener(x -> updateNeo4jConnection());
+    }
+
+    //endregion
+
+    //region Neo4J connection
+
+    private void updateNeo4jConnection() {
+        facade.updateNeo4jConnection(txtNeo4jURI.getText(), txtNeo4jUsername.getText(), new String(txtNeo4jPassword.getPassword()));
     }
     //endregion
 

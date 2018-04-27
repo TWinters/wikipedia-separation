@@ -7,7 +7,16 @@ import java.util.Collection;
 import java.util.List;
 
 public class WikipediaSeperationFacade implements IWikipediaSeperationFacade {
-    private final WikipediaLinksFinder linksFinder = new WikipediaLinksFinder();
+    private WikipediaLinksFinder linksFinder;
+
+    public WikipediaSeperationFacade(String neo4jURI, String neo4jUsername, String neo4jPassword) {
+        updateNeo4jConnection(neo4jURI, neo4jUsername, neo4jPassword);
+    }
+
+    @Override
+    public void updateNeo4jConnection(String neo4jURI, String neo4jUsername, String neo4jPassword) {
+        this.linksFinder = new WikipediaLinksFinder(neo4jURI, neo4jUsername, neo4jPassword);
+    }
 
     @Override
     public List<Long> getClusters() {

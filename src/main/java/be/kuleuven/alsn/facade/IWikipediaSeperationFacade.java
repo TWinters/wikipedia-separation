@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface IWikipediaSeperationFacade {
 
+    void updateNeo4jConnection(String neo4jURI, String neo4jUsername, String neo4jPassword);
+
     List<Long> getClusters();
 
     Collection<WikipediaPath> calculateShortestPath(String from, String to);
