@@ -1,6 +1,9 @@
 # wikipedia-separation
 Project for the KU Leuven course *Analysis of Large Scale Social Networks*. 
 
+## Report link
+https://www.sharelatex.com/9129584415ppwrymrvnpnc
+
 ## Setting up
 
 ### Required programs
