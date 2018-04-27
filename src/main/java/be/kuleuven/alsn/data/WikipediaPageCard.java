@@ -1,15 +1,15 @@
 package be.kuleuven.alsn.data;
 
 public class WikipediaPageCard {
-    private final String pageName;
     private final long pageId;
+    private final String pageName;
 
-    public WikipediaPageCard(String pageName, long pageId) {
+    public WikipediaPageCard(long pageId, String pageName) {
 
         this.pageName = pageName;
         this.pageId = pageId;
     }
-    
+
     public long getPageId() {
         return pageId;
     }

@@ -1,12 +1,15 @@
 package be.kuleuven.alsn;
 
 import be.kuleuven.alsn.arguments.LinksFinderArguments;
+import be.kuleuven.alsn.data.WikipediaPageCard;
+import be.kuleuven.alsn.data.WikipediaPath;
 import com.beust.jcommander.JCommander;
 import org.neo4j.driver.internal.InternalPath;
 import org.neo4j.driver.v1.*;
+import org.neo4j.driver.v1.types.Entity;
 
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -27,44 +30,45 @@ public class WikipediaLinksFinder implements AutoCloseable {
 
     private static final String shortestPathQuery = "MATCH (begin:Page { title: $from }),(end:Page { title: $to }), p = shortestPath((begin)-[:REFERENCES_TO*]->(end)) RETURN p";
 
-    public void findShortestPath(final String from, final String to) {
-        HashSet<List<String>> shortestPaths =
-                extractPathsFromStatementResult(
-                        driver.session().writeTransaction(tx ->
+    public Collection<WikipediaPath> findShortestPath(final String from, final String to) {
+        return extractPathsFromStatementResult(
+                driver
+                        .session()
+                        .writeTransaction(tx ->
                                 tx.run(shortestPathQuery, parameters("from", from, "to", to))));
-        System.out.println(
-                shortestPaths.stream().
-                        map(list -> list.stream().
-                                collect(Collectors.joining(" -> "))).
-                        collect(Collectors.joining("\n")));
 
     }
 
     // TODO: Optimaliseerbaar door gebruik van volgende query: 'MATCH (s) WHERE ID(s) in [19, 3309035] RETURN ID(s),s.title' voor meerdere nodes
     private static final String nodeNameQuery = "MATCH (s) WHERE ID(s) = $id RETURN s.title";
 
-    private String getNodeName(final long nodeId) {
-        return driver.session()
-                .writeTransaction(tx ->
-                        tx.run(nodeNameQuery, parameters("id", nodeId)))
-                .single().get(0).asString();
-    }
 
-
-    private HashSet<List<String>> extractPathsFromStatementResult(StatementResult result) {
+    private Collection<WikipediaPath> extractPathsFromStatementResult(StatementResult result) {
         // Using a set to filter out duplicate paths (due to duplicate IDs for pages)
-        HashSet<List<String>> paths = new HashSet<>();
+        HashSet<WikipediaPath> paths = new HashSet<>();
 
         // For all found shortest paths
         for (Record rec : result.list()) {
             rec.asMap().forEach((key, value) ->
-                    paths.add(convertPathToList((InternalPath) value)));
+                    paths.add(convertPath((InternalPath) value)));
         }
         return paths;
     }
 
-    private List<String> convertPathToList(InternalPath path) {
-        return StreamSupport.stream(path.nodes().spliterator(), false).map(e -> getNodeName(e.id())).collect(Collectors.toList());
+    private WikipediaPath convertPath(InternalPath path) {
+        return new WikipediaPath(
+                StreamSupport.stream(path.nodes()
+                        .spliterator(), false)
+                        .map(Entity::id)
+                        .map(this::toWikipediaPageCard)
+                        .collect(Collectors.toList()));
+    }
+
+    private WikipediaPageCard toWikipediaPageCard(final long nodeId) {
+        return new WikipediaPageCard(nodeId, driver.session()
+                .writeTransaction(tx ->
+                        tx.run(nodeNameQuery, parameters("id", nodeId)))
+                .single().get(0).asString());
     }
 
     public static void main(String... args) throws Exception {
@@ -77,6 +81,8 @@ public class WikipediaLinksFinder implements AutoCloseable {
 
 
         WikipediaLinksFinder finder = new WikipediaLinksFinder(arguments.getDatabaseUrl(), arguments.getLogin(), arguments.getPassword());
-        finder.findShortestPath(arguments.getFrom(), arguments.getTo());
+        System.out.println(finder.findShortestPath(arguments.getFrom(), arguments.getTo())
+                .stream().map(WikipediaPath::toString)
+                .collect(Collectors.joining("\n")));
     }
 }
