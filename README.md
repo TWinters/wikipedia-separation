@@ -115,3 +115,14 @@ This program requires several arguments given with the command line, namely:
 
 For example, possible program arguments are:
 `-db_login neo4j -db_pw admin -from Katholieke_Universiteit_Leuven -to Adolf_Hitler`
+
+
+## Louvain community detection 
+
+### Apache Spark on Amazon EMR
+https://aws.amazon.com/blogs/aws/new-apache-spark-on-amazon-emr/
+https://docs.aws.amazon.com/emr/latest/ReleaseGuide/emr-spark.html
+
+### Distributed Graph Analytics
+http://sotera.github.io/distributed-graph-analytics/
+http://sotera.github.io/distributed-graph-analytics/louvain/example/graphx/
