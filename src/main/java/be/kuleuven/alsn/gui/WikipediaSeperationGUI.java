@@ -1,7 +1,11 @@
 package be.kuleuven.alsn.gui;
 
+import be.kuleuven.alsn.arguments.LinksFinderArguments;
+import be.kuleuven.alsn.arguments.Neo4jConnectionDetails;
 import be.kuleuven.alsn.data.WikipediaPath;
 import be.kuleuven.alsn.facade.IWikipediaSeperationFacade;
+import be.kuleuven.alsn.facade.WikipediaSeperationFacade;
+import com.beust.jcommander.JCommander;
 
 import javax.swing.*;
 import java.util.Collection;
@@ -31,6 +35,17 @@ public class WikipediaSeperationGUI {
         updateConnectionButton.addActionListener(x -> updateNeo4jConnection());
     }
 
+    private void setDefaultLinkArguments(LinksFinderArguments linkArguments) {
+        this.txtFrom.setText(linkArguments.getFrom());
+        this.txtTo.setText(linkArguments.getTo());
+    }
+
+    private void setNeo4jConnection(Neo4jConnectionDetails neo4jArguments) {
+        this.txtNeo4jURI.setText(neo4jArguments.getDatabaseUrl());
+        this.txtNeo4jUsername.setText(neo4jArguments.getLogin());
+        this.txtNeo4jPassword.setText(neo4jArguments.getPassword());
+        updateNeo4jConnection();
+    }
     //endregion
 
     //region Neo4J connection
@@ -46,6 +61,7 @@ public class WikipediaSeperationGUI {
         String to = txtTo.getText();
 
         Collection<WikipediaPath> path = facade.calculateShortestPath(from, to);
+
 
     }
     //end region
@@ -73,7 +89,20 @@ public class WikipediaSeperationGUI {
 
 
     public static void main(String[] args) {
-        new WikipediaSeperationGUI(null).run();
+        Neo4jConnectionDetails neo4jArguments = new Neo4jConnectionDetails();
+        LinksFinderArguments linkArguments = new LinksFinderArguments();
+
+        JCommander.newBuilder()
+                .addObject(neo4jArguments)
+                .addObject(linkArguments)
+                .build()
+                .parse(args);
+
+        WikipediaSeperationGUI gui = new WikipediaSeperationGUI(new WikipediaSeperationFacade());
+        gui.setNeo4jConnection(neo4jArguments);
+        gui.setDefaultLinkArguments(linkArguments);
+        gui.run();
     }
+
     //endregion
 }

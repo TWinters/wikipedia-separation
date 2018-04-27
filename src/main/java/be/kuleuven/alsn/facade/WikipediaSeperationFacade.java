@@ -9,9 +9,6 @@ import java.util.List;
 public class WikipediaSeperationFacade implements IWikipediaSeperationFacade {
     private WikipediaLinksFinder linksFinder;
 
-    public WikipediaSeperationFacade(String neo4jURI, String neo4jUsername, String neo4jPassword) {
-        updateNeo4jConnection(neo4jURI, neo4jUsername, neo4jPassword);
-    }
 
     @Override
     public void updateNeo4jConnection(String neo4jURI, String neo4jUsername, String neo4jPassword) {

@@ -22,4 +22,12 @@ public class WikipediaPath {
                 .map(WikipediaPageCard::getPageName)
                 .collect(Collectors.joining(" -> "));
     }
+
+    public int getPathLength() {
+        return pages.size();
+    }
+
+    public WikipediaPageCard getPage(int index) {
+        return pages.get(index);
+    }
 }
