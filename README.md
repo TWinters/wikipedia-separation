@@ -121,8 +121,10 @@ For example, possible program arguments are:
 
 ### Apache Spark on Amazon EMR
 https://aws.amazon.com/blogs/aws/new-apache-spark-on-amazon-emr/
+
 https://docs.aws.amazon.com/emr/latest/ReleaseGuide/emr-spark.html
 
 ### Distributed Graph Analytics
 http://sotera.github.io/distributed-graph-analytics/
+
 http://sotera.github.io/distributed-graph-analytics/louvain/example/graphx/
