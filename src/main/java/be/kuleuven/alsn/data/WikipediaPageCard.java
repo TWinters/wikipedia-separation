@@ -1,5 +1,7 @@
 package be.kuleuven.alsn.data;
 
+import java.util.Objects;
+
 public class WikipediaPageCard {
     private final long pageId;
     private final String pageName;
@@ -15,8 +17,26 @@ public class WikipediaPageCard {
     }
 
     public String getPageName() {
-
         return pageName;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        WikipediaPageCard that = (WikipediaPageCard) o;
+        return pageId == that.pageId &&
+                Objects.equals(pageName, that.pageName);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(pageId, pageName);
+    }
+
+    @Override
+    public String toString() {
+        return pageName + " (" + pageId + ")";
+    }
 }
