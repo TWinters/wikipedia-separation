@@ -6,6 +6,7 @@ import be.kuleuven.alsn.data.WikipediaPath;
 import be.kuleuven.alsn.facade.IWikipediaSeperationFacade;
 import be.kuleuven.alsn.facade.WikipediaSeperationFacade;
 import com.beust.jcommander.JCommander;
+import org.neo4j.driver.v1.exceptions.AuthenticationException;
 
 import javax.swing.*;
 import java.util.Collection;
@@ -19,6 +20,7 @@ public class WikipediaSeperationGUI {
     private JButton btnToWhiteList;
     private JButton btnCalculateShortestPath;
     private JPanel mainPanel;
+    private JTabbedPane tabbedPane1;
     private JTextField txtNeo4jUsername;
     private JTextField txtNeo4jURI;
     private JPasswordField txtNeo4jPassword;
@@ -29,10 +31,15 @@ public class WikipediaSeperationGUI {
 
     public WikipediaSeperationGUI(IWikipediaSeperationFacade facade) {
         this.facade = facade;
+
+        // Setting connections
+        facade.getNeo4JConnectDetails().ifPresent(this::setNeo4jConnection);
+
+        // Linking buttons
         btnCalculateShortestPath.addActionListener(x -> calculateShortestPath());
         btnToBlacklist.addActionListener(x -> addSelectionToBlacklist());
         btnToWhiteList.addActionListener(x -> addSelectionToWhitelist());
-        updateConnectionButton.addActionListener(x -> updateNeo4jConnection());
+        updateConnectionButton.addActionListener(x -> updateNeo4jConnection(true));
     }
 
     private void setDefaultLinkArguments(LinksFinderArguments linkArguments) {
@@ -40,43 +47,69 @@ public class WikipediaSeperationGUI {
         this.txtTo.setText(linkArguments.getTo());
     }
 
-    private void setNeo4jConnection(Neo4jConnectionDetails neo4jArguments) {
-        this.txtNeo4jURI.setText(neo4jArguments.getDatabaseUrl());
-        this.txtNeo4jUsername.setText(neo4jArguments.getLogin());
-        this.txtNeo4jPassword.setText(neo4jArguments.getPassword());
-        updateNeo4jConnection();
-    }
     //endregion
 
-    //region Neo4J connection
-
-    private void updateNeo4jConnection() {
-        facade.updateNeo4jConnection(txtNeo4jURI.getText(), txtNeo4jUsername.getText(), new String(txtNeo4jPassword.getPassword()));
-    }
-    //endregion
 
     //region Calculating shortest path
     private void calculateShortestPath() {
         String from = txtFrom.getText();
         String to = txtTo.getText();
 
-        Collection<WikipediaPath> path = facade.calculateShortestPath(from, to);
+        Collection<WikipediaPath> paths = facade.calculateShortestPath(from, to);
 
+        System.out.println("Found paths: " + paths);
 
+//        // test code
+//        paths = Collections.singleton(new WikipediaPath(
+//                Arrays.asList(
+//                        new WikipediaPageCard(3, "Dit"),
+//                        new WikipediaPageCard(1, "is"),
+//                        new WikipediaPageCard(4, "een"),
+//                        new WikipediaPageCard(5, "Test")
+//                )
+//        ));
+
+        // Open a window for each path
+        paths.stream().map(WikipediaPathViewer::new).forEach(WikipediaPathViewer::run);
     }
     //end region
 
 
     //region Cluster filtering
     private void addSelectionToWhitelist() {
-        //TODO
+        // TODO
     }
 
     private void addSelectionToBlacklist() {
         //TODO
     }
-    //endregion
 
+
+    //region updating Neo4J connection
+    private void setNeo4jConnection(Neo4jConnectionDetails neo4jArguments) {
+        this.txtNeo4jURI.setText(neo4jArguments.getDatabaseUrl());
+        this.txtNeo4jUsername.setText(neo4jArguments.getLogin());
+        this.txtNeo4jPassword.setText(neo4jArguments.getPassword());
+        updateNeo4jConnection(false);
+    }
+
+    private void updateNeo4jConnection(boolean showSuccessDialog) {
+        try {
+            facade.setNeo4jConnection(txtNeo4jURI.getText(), txtNeo4jUsername.getText(), new String(txtNeo4jPassword.getPassword()));
+            if (showSuccessDialog) {
+                JOptionPane.showMessageDialog(mainPanel,
+                        "Successfully connected to Neo4J!",
+                        "Neo4J connection successful",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (AuthenticationException authEx) {
+            JOptionPane.showMessageDialog(mainPanel,
+                    "Could not connect to the Neo4J server using the provided details",
+                    "Neo4J connection error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    //endregion
 
     //region Running the GUI
     public void run() {
@@ -98,8 +131,10 @@ public class WikipediaSeperationGUI {
                 .build()
                 .parse(args);
 
-        WikipediaSeperationGUI gui = new WikipediaSeperationGUI(new WikipediaSeperationFacade());
-        gui.setNeo4jConnection(neo4jArguments);
+        IWikipediaSeperationFacade facade = new WikipediaSeperationFacade();
+        facade.setNeo4jConnection(neo4jArguments);
+
+        WikipediaSeperationGUI gui = new WikipediaSeperationGUI(facade);
         gui.setDefaultLinkArguments(linkArguments);
         gui.run();
     }
