@@ -9,6 +9,7 @@ public class WikipediaPathViewer {
     private final WikipediaPath path;
     private JList<WikipediaPageCard> lstPath;
     private JPanel mainPanel;
+    private JButton viewCommunitiesButton;
 
     public WikipediaPathViewer(WikipediaPath path) {
         this.path = path;
@@ -24,6 +25,11 @@ public class WikipediaPathViewer {
             }
         };
         this.lstPath.setModel(listModel);
+        viewCommunitiesButton.addActionListener(x -> viewCommunitiesSelectedNode());
+    }
+
+    private void viewCommunitiesSelectedNode() {
+        System.out.println(lstPath.getSelectedValue());
     }
 
     //region Running the GUI
