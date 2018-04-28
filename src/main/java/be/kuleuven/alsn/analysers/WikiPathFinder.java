@@ -1,4 +1,4 @@
-package be.kuleuven.alsn;
+package be.kuleuven.alsn.analysers;
 
 import be.kuleuven.alsn.arguments.LinksFinderArguments;
 import be.kuleuven.alsn.arguments.Neo4jConnectionDetails;
@@ -16,12 +16,18 @@ import java.util.stream.StreamSupport;
 
 import static org.neo4j.driver.v1.Values.parameters;
 
-public class WikipediaLinksFinder implements AutoCloseable {
+public class WikiPathFinder implements AutoCloseable {
 
     private final Driver driver;
 
-    public WikipediaLinksFinder(String uri, String user, String password) {
+    public WikiPathFinder(String uri, String user, String password) {
         driver = GraphDatabase.driver(uri, AuthTokens.basic(user, password));
+    }
+
+    public WikiPathFinder(Neo4jConnectionDetails neo4jArguments) {
+        this(neo4jArguments.getDatabaseUrl(),
+                neo4jArguments.getLogin(),
+                neo4jArguments.getPassword());
     }
 
     @Override
@@ -82,7 +88,7 @@ public class WikipediaLinksFinder implements AutoCloseable {
                 .parse(args);
 
 
-        WikipediaLinksFinder finder = new WikipediaLinksFinder(neo4jArguments.getDatabaseUrl(), neo4jArguments.getLogin(), neo4jArguments.getPassword());
+        WikiPathFinder finder = new WikiPathFinder(neo4jArguments.getDatabaseUrl(), neo4jArguments.getLogin(), neo4jArguments.getPassword());
         System.out.println(finder.findShortestPath(linkArguments.getFrom(), linkArguments.getTo())
                 .stream().map(WikiPath::toString)
                 .collect(Collectors.joining("\n")));

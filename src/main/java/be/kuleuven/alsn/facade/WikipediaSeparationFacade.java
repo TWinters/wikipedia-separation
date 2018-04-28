@@ -1,6 +1,6 @@
 package be.kuleuven.alsn.facade;
 
-import be.kuleuven.alsn.WikipediaLinksFinder;
+import be.kuleuven.alsn.analysers.WikiPathFinder;
 import be.kuleuven.alsn.arguments.Neo4jConnectionDetails;
 import be.kuleuven.alsn.data.WikiPath;
 
@@ -8,8 +8,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public class WikipediaSeperationFacade implements IWikipediaSeperationFacade {
-    private WikipediaLinksFinder linksFinder;
+public class WikipediaSeparationFacade implements IWikipediaSeparationFacade {
+    private WikiPathFinder linksFinder;
     private Neo4jConnectionDetails neo4jConnectionDetails;
 
     @Override
@@ -31,10 +31,7 @@ public class WikipediaSeperationFacade implements IWikipediaSeperationFacade {
     @Override
     public void setNeo4jConnection(Neo4jConnectionDetails neo4jArguments) {
         this.neo4jConnectionDetails = neo4jArguments;
-        this.linksFinder = new WikipediaLinksFinder(
-                neo4jArguments.getDatabaseUrl(),
-                neo4jArguments.getLogin(),
-                neo4jArguments.getPassword());
+        this.linksFinder = new WikiPathFinder(neo4jArguments);
 
     }
 

@@ -3,8 +3,8 @@ package be.kuleuven.alsn.gui;
 import be.kuleuven.alsn.arguments.LinksFinderArguments;
 import be.kuleuven.alsn.arguments.Neo4jConnectionDetails;
 import be.kuleuven.alsn.data.WikiPath;
-import be.kuleuven.alsn.facade.IWikipediaSeperationFacade;
-import be.kuleuven.alsn.facade.WikipediaSeperationFacade;
+import be.kuleuven.alsn.facade.IWikipediaSeparationFacade;
+import be.kuleuven.alsn.facade.WikipediaSeparationFacade;
 import com.beust.jcommander.JCommander;
 import org.neo4j.driver.v1.exceptions.AuthenticationException;
 
@@ -27,9 +27,9 @@ public class WikipediaSeperationGUI {
     private JButton updateConnectionButton;
 
     //region Initialisation
-    private final IWikipediaSeperationFacade facade;
+    private final IWikipediaSeparationFacade facade;
 
-    public WikipediaSeperationGUI(IWikipediaSeperationFacade facade) {
+    public WikipediaSeperationGUI(IWikipediaSeparationFacade facade) {
         this.facade = facade;
 
         // Setting connections
@@ -131,7 +131,7 @@ public class WikipediaSeperationGUI {
                 .build()
                 .parse(args);
 
-        IWikipediaSeperationFacade facade = new WikipediaSeperationFacade();
+        IWikipediaSeparationFacade facade = new WikipediaSeparationFacade();
         facade.setNeo4jConnection(neo4jArguments);
 
         WikipediaSeperationGUI gui = new WikipediaSeperationGUI(facade);

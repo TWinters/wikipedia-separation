@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public interface IWikipediaSeperationFacade {
+public interface IWikipediaSeparationFacade {
 
     default void setNeo4jConnection(String neo4jURI, String neo4jUsername, String neo4jPassword) {
         this.setNeo4jConnection(new Neo4jConnectionDetails(neo4jURI, neo4jUsername, neo4jPassword));
