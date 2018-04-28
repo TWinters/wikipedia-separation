@@ -119,6 +119,9 @@ For example, possible program arguments are:
 
 ## Louvain community detection 
 
+### Export Data
+http://sotera.github.io/distributed-graph-analytics/FAQ/#how-data
+
 ### Apache Spark on Amazon EMR
 https://aws.amazon.com/blogs/aws/new-apache-spark-on-amazon-emr/
 
