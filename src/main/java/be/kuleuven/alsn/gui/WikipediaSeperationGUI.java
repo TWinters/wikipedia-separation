@@ -2,7 +2,7 @@ package be.kuleuven.alsn.gui;
 
 import be.kuleuven.alsn.arguments.LinksFinderArguments;
 import be.kuleuven.alsn.arguments.Neo4jConnectionDetails;
-import be.kuleuven.alsn.data.WikipediaPath;
+import be.kuleuven.alsn.data.WikiPath;
 import be.kuleuven.alsn.facade.IWikipediaSeperationFacade;
 import be.kuleuven.alsn.facade.WikipediaSeperationFacade;
 import com.beust.jcommander.JCommander;
@@ -55,17 +55,17 @@ public class WikipediaSeperationGUI {
         String from = txtFrom.getText();
         String to = txtTo.getText();
 
-        Collection<WikipediaPath> paths = facade.calculateShortestPath(from, to);
+        Collection<WikiPath> paths = facade.calculateShortestPath(from, to);
 
         System.out.println("Found paths: " + paths);
 
 //        // test code
-//        paths = Collections.singleton(new WikipediaPath(
+//        paths = Collections.singleton(new WikiPath(
 //                Arrays.asList(
-//                        new WikipediaPageCard(3, "Dit"),
-//                        new WikipediaPageCard(1, "is"),
-//                        new WikipediaPageCard(4, "een"),
-//                        new WikipediaPageCard(5, "Test")
+//                        new WikiPageCard(3, "Dit"),
+//                        new WikiPageCard(1, "is"),
+//                        new WikiPageCard(4, "een"),
+//                        new WikiPageCard(5, "Test")
 //                )
 //        ));
 
@@ -138,6 +138,5 @@ public class WikipediaSeperationGUI {
         gui.setDefaultLinkArguments(linkArguments);
         gui.run();
     }
-
     //endregion
 }

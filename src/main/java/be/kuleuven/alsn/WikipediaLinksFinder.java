@@ -2,8 +2,8 @@ package be.kuleuven.alsn;
 
 import be.kuleuven.alsn.arguments.LinksFinderArguments;
 import be.kuleuven.alsn.arguments.Neo4jConnectionDetails;
-import be.kuleuven.alsn.data.WikipediaPageCard;
-import be.kuleuven.alsn.data.WikipediaPath;
+import be.kuleuven.alsn.data.WikiPageCard;
+import be.kuleuven.alsn.data.WikiPath;
 import com.beust.jcommander.JCommander;
 import org.neo4j.driver.internal.InternalPath;
 import org.neo4j.driver.v1.*;
@@ -31,10 +31,9 @@ public class WikipediaLinksFinder implements AutoCloseable {
 
     private static final String shortestPathQuery = "MATCH (begin:Page { title: $from }),(end:Page { title: $to }), p = shortestPath((begin)-[:REFERENCES_TO*]->(end)) RETURN p";
 
-    public Collection<WikipediaPath> findShortestPath(final String from, final String to) {
+    public Collection<WikiPath> findShortestPath(final String from, final String to) {
         return extractPathsFromStatementResult(
-                driver
-                        .session()
+                driver.session()
                         .writeTransaction(tx ->
                                 tx.run(shortestPathQuery, parameters("from", from, "to", to))));
 
@@ -44,9 +43,9 @@ public class WikipediaLinksFinder implements AutoCloseable {
     private static final String nodeNameQuery = "MATCH (s) WHERE ID(s) = $id RETURN s.title";
 
 
-    private Collection<WikipediaPath> extractPathsFromStatementResult(StatementResult result) {
+    private Collection<WikiPath> extractPathsFromStatementResult(StatementResult result) {
         // Using a set to filter out duplicate paths (due to duplicate IDs for pages)
-        HashSet<WikipediaPath> paths = new HashSet<>();
+        HashSet<WikiPath> paths = new HashSet<>();
 
         // For all found shortest paths
         for (Record rec : result.list()) {
@@ -56,8 +55,8 @@ public class WikipediaLinksFinder implements AutoCloseable {
         return paths;
     }
 
-    private WikipediaPath convertPath(InternalPath path) {
-        return new WikipediaPath(
+    private WikiPath convertPath(InternalPath path) {
+        return new WikiPath(
                 StreamSupport.stream(path.nodes()
                         .spliterator(), false)
                         .map(Entity::id)
@@ -65,8 +64,8 @@ public class WikipediaLinksFinder implements AutoCloseable {
                         .collect(Collectors.toList()));
     }
 
-    private WikipediaPageCard toWikipediaPageCard(final long nodeId) {
-        return new WikipediaPageCard(nodeId, driver.session()
+    private WikiPageCard toWikipediaPageCard(final long nodeId) {
+        return new WikiPageCard(nodeId, driver.session()
                 .writeTransaction(tx ->
                         tx.run(nodeNameQuery, parameters("id", nodeId)))
                 .single().get(0).asString());
@@ -85,7 +84,7 @@ public class WikipediaLinksFinder implements AutoCloseable {
 
         WikipediaLinksFinder finder = new WikipediaLinksFinder(neo4jArguments.getDatabaseUrl(), neo4jArguments.getLogin(), neo4jArguments.getPassword());
         System.out.println(finder.findShortestPath(linkArguments.getFrom(), linkArguments.getTo())
-                .stream().map(WikipediaPath::toString)
+                .stream().map(WikiPath::toString)
                 .collect(Collectors.joining("\n")));
     }
 }

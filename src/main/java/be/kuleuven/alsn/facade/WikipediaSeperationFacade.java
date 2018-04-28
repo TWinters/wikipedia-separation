@@ -2,7 +2,7 @@ package be.kuleuven.alsn.facade;
 
 import be.kuleuven.alsn.WikipediaLinksFinder;
 import be.kuleuven.alsn.arguments.Neo4jConnectionDetails;
-import be.kuleuven.alsn.data.WikipediaPath;
+import be.kuleuven.alsn.data.WikiPath;
 
 import java.util.Collection;
 import java.util.List;
@@ -18,7 +18,7 @@ public class WikipediaSeperationFacade implements IWikipediaSeperationFacade {
     }
 
     @Override
-    public Collection<WikipediaPath> calculateShortestPath(String from, String to) {
+    public Collection<WikiPath> calculateShortestPath(String from, String to) {
         return linksFinder.findShortestPath(from, to);
     }
 

@@ -1,26 +1,26 @@
 package be.kuleuven.alsn.gui;
 
-import be.kuleuven.alsn.data.WikipediaPageCard;
-import be.kuleuven.alsn.data.WikipediaPath;
+import be.kuleuven.alsn.data.WikiPageCard;
+import be.kuleuven.alsn.data.WikiPath;
 
 import javax.swing.*;
 
 public class WikipediaPathViewer {
-    private final WikipediaPath path;
-    private JList<WikipediaPageCard> lstPath;
+    private final WikiPath path;
+    private JList<WikiPageCard> lstPath;
     private JPanel mainPanel;
     private JButton viewCommunitiesButton;
 
-    public WikipediaPathViewer(WikipediaPath path) {
+    public WikipediaPathViewer(WikiPath path) {
         this.path = path;
-        ListModel<WikipediaPageCard> listModel = new AbstractListModel<WikipediaPageCard>() {
+        ListModel<WikiPageCard> listModel = new AbstractListModel<WikiPageCard>() {
             @Override
             public int getSize() {
                 return path.getPathLength();
             }
 
             @Override
-            public WikipediaPageCard getElementAt(int index) {
+            public WikiPageCard getElementAt(int index) {
                 return path.getPage(index);
             }
         };

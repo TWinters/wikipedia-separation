@@ -6,14 +6,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class WikipediaPath {
-    private final ImmutableList<WikipediaPageCard> pages;
+public class WikiPath {
+    private final ImmutableList<WikiPageCard> pages;
 
-    public WikipediaPath(List<WikipediaPageCard> pages) {
+    public WikiPath(List<WikiPageCard> pages) {
         this.pages = ImmutableList.copyOf(pages);
     }
 
-    public List<WikipediaPageCard> getPages() {
+    public List<WikiPageCard> getPages() {
         return pages;
     }
 
@@ -22,14 +22,14 @@ public class WikipediaPath {
         return pages.size();
     }
 
-    public WikipediaPageCard getPage(int index) {
+    public WikiPageCard getPage(int index) {
         return pages.get(index);
     }
 
     @Override
     public String toString() {
         return pages.stream()
-                .map(WikipediaPageCard::getPageName)
+                .map(WikiPageCard::getPageName)
                 .collect(Collectors.joining(" -> "));
     }
 
@@ -37,7 +37,7 @@ public class WikipediaPath {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        WikipediaPath that = (WikipediaPath) o;
+        WikiPath that = (WikiPath) o;
         return Objects.equals(pages, that.pages);
     }
 

@@ -2,11 +2,11 @@ package be.kuleuven.alsn.data;
 
 import java.util.Objects;
 
-public class WikipediaPageCard {
+public class WikiPageCard {
     private final long pageId;
     private final String pageName;
 
-    public WikipediaPageCard(long pageId, String pageName) {
+    public WikiPageCard(long pageId, String pageName) {
 
         this.pageName = pageName;
         this.pageId = pageId;
@@ -24,7 +24,7 @@ public class WikipediaPageCard {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        WikipediaPageCard that = (WikipediaPageCard) o;
+        WikiPageCard that = (WikiPageCard) o;
         return pageId == that.pageId &&
                 Objects.equals(pageName, that.pageName);
     }
