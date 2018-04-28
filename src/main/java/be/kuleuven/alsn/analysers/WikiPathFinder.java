@@ -6,7 +6,9 @@ import be.kuleuven.alsn.data.WikiPageCard;
 import be.kuleuven.alsn.data.WikiPath;
 import com.beust.jcommander.JCommander;
 import org.neo4j.driver.internal.InternalPath;
-import org.neo4j.driver.v1.*;
+import org.neo4j.driver.v1.Driver;
+import org.neo4j.driver.v1.Record;
+import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.types.Entity;
 
 import java.util.Collection;
@@ -20,14 +22,12 @@ public class WikiPathFinder implements AutoCloseable {
 
     private final Driver driver;
 
-    public WikiPathFinder(String uri, String user, String password) {
-        driver = GraphDatabase.driver(uri, AuthTokens.basic(user, password));
+    private WikiPathFinder(Driver driver) {
+        this.driver = driver;
     }
 
     public WikiPathFinder(Neo4jConnectionDetails neo4jArguments) {
-        this(neo4jArguments.getDatabaseUrl(),
-                neo4jArguments.getLogin(),
-                neo4jArguments.getPassword());
+        this(neo4jArguments.createConnection());
     }
 
     @Override
@@ -88,7 +88,7 @@ public class WikiPathFinder implements AutoCloseable {
                 .parse(args);
 
 
-        WikiPathFinder finder = new WikiPathFinder(neo4jArguments.getDatabaseUrl(), neo4jArguments.getLogin(), neo4jArguments.getPassword());
+        WikiPathFinder finder = new WikiPathFinder(neo4jArguments);
         System.out.println(finder.findShortestPath(linkArguments.getFrom(), linkArguments.getTo())
                 .stream().map(WikiPath::toString)
                 .collect(Collectors.joining("\n")));

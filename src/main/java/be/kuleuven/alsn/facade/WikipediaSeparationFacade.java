@@ -1,5 +1,6 @@
 package be.kuleuven.alsn.facade;
 
+import be.kuleuven.alsn.analysers.WikiPageExistanceChecker;
 import be.kuleuven.alsn.analysers.WikiPathFinder;
 import be.kuleuven.alsn.arguments.Neo4jConnectionDetails;
 import be.kuleuven.alsn.data.WikiPath;
@@ -10,6 +11,7 @@ import java.util.Optional;
 
 public class WikipediaSeparationFacade implements IWikipediaSeparationFacade {
     private WikiPathFinder linksFinder;
+    private WikiPageExistanceChecker existanceChecker;
     private Neo4jConnectionDetails neo4jConnectionDetails;
 
     @Override
@@ -24,7 +26,7 @@ public class WikipediaSeparationFacade implements IWikipediaSeparationFacade {
 
     @Override
     public boolean isValidPage(String page) {
-        return false;
+        return existanceChecker.isValidPage(page);
     }
 
     //region Neo4J Connection
@@ -32,6 +34,7 @@ public class WikipediaSeparationFacade implements IWikipediaSeparationFacade {
     public void setNeo4jConnection(Neo4jConnectionDetails neo4jArguments) {
         this.neo4jConnectionDetails = neo4jArguments;
         this.linksFinder = new WikiPathFinder(neo4jArguments);
+        this.existanceChecker = new WikiPageExistanceChecker(neo4jArguments);
 
     }
 
@@ -39,6 +42,5 @@ public class WikipediaSeparationFacade implements IWikipediaSeparationFacade {
     public Optional<Neo4jConnectionDetails> getNeo4JConnectDetails() {
         return Optional.ofNullable(neo4jConnectionDetails);
     }
-
     //endregion
 }
