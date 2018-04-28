@@ -55,9 +55,8 @@ public class WikipediaSeperationGUI {
         String from = txtFrom.getText();
         String to = txtTo.getText();
 
-        Collection<WikiPath> paths = facade.calculateShortestPath(from, to);
-
-        System.out.println("Found paths: " + paths);
+        if (checkValidnessWithDialog(from) && checkValidnessWithDialog(to)) {
+            Collection<WikiPath> paths = facade.calculateShortestPath(from, to);
 
 //        // test code
 //        paths = Collections.singleton(new WikiPath(
@@ -69,11 +68,22 @@ public class WikipediaSeperationGUI {
 //                )
 //        ));
 
-        // Open a window for each path
-        paths.stream().map(WikipediaPathViewer::new).forEach(WikipediaPathViewer::run);
+            // Open a window for each path
+            paths.stream().map(WikipediaPathViewer::new).forEach(WikipediaPathViewer::run);
+        }
     }
     //end region
 
+    private boolean checkValidnessWithDialog(String page) {
+        if (!facade.isValidPage(page)) {
+            JOptionPane.showMessageDialog(mainPanel,
+                    "The given page '" + page + "' does not exist.",
+                    "Neo4J non-existing page error",
+                    JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        return true;
+    }
 
     //region Cluster filtering
     private void addSelectionToWhitelist() {
