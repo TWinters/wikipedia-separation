@@ -60,11 +60,18 @@ public class WikipediaSeperationGUI {
             if (checkValidnessWithDialog(from) && checkValidnessWithDialog(to)) {
                 Collection<WikiPath> paths = facade.calculateShortestPath(from, to);
 
-                // Open a window for each path
-                paths.stream()
-                        .peek(System.out::println)
-                        .map(WikipediaPathViewer::new)
-                        .forEach(WikipediaPathViewer::run);
+                if (paths.isEmpty()) {
+                    JOptionPane.showMessageDialog(mainPanel,
+                            "There is no path found between '" + from + "' and '" + to + "'.",
+                            "No paths found",
+                            JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    // Open a window for each path
+                    paths.stream()
+                            .peek(System.out::println)
+                            .map(WikipediaPathViewer::new)
+                            .forEach(WikipediaPathViewer::run);
+                }
             }
             btnCalculateShortestPath.setEnabled(true);
         }).start();
