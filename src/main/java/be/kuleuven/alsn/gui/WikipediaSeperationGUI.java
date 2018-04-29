@@ -55,22 +55,19 @@ public class WikipediaSeperationGUI {
         String from = txtFrom.getText();
         String to = txtTo.getText();
 
-        if (checkValidnessWithDialog(from) && checkValidnessWithDialog(to)) {
-            Collection<WikiPath> paths = facade.calculateShortestPath(from, to);
+        btnCalculateShortestPath.setEnabled(false);
+        new Thread(() -> {
+            if (checkValidnessWithDialog(from) && checkValidnessWithDialog(to)) {
+                Collection<WikiPath> paths = facade.calculateShortestPath(from, to);
 
-//        // test code
-//        paths = Collections.singleton(new WikiPath(
-//                Arrays.asList(
-//                        new WikiPageCard(3, "Dit"),
-//                        new WikiPageCard(1, "is"),
-//                        new WikiPageCard(4, "een"),
-//                        new WikiPageCard(5, "Test")
-//                )
-//        ));
-
-            // Open a window for each path
-            paths.stream().map(WikipediaPathViewer::new).forEach(WikipediaPathViewer::run);
-        }
+                // Open a window for each path
+                paths.stream()
+                        .peek(System.out::println)
+                        .map(WikipediaPathViewer::new)
+                        .forEach(WikipediaPathViewer::run);
+            }
+            btnCalculateShortestPath.setEnabled(true);
+        }).start();
     }
     //end region
 

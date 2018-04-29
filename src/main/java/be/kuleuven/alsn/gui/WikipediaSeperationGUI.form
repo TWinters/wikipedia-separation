@@ -14,7 +14,9 @@
             <preferred-size width="200" height="200"/>
           </grid>
         </constraints>
-        <properties/>
+        <properties>
+          <enabled value="true"/>
+        </properties>
         <border type="none"/>
         <children>
           <grid id="b82e1" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -84,7 +86,9 @@
             <constraints>
               <tabbedpane title="Communities Filter"/>
             </constraints>
-            <properties/>
+            <properties>
+              <enabled value="false"/>
+            </properties>
             <border type="none" title=""/>
             <children>
               <component id="237b9" class="javax.swing.JLabel">
