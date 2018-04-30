@@ -37,6 +37,6 @@ public class WikiPageCard {
 
     @Override
     public String toString() {
-        return pageName + " (" + pageId + ")";
+        return pageName;
     }
 }

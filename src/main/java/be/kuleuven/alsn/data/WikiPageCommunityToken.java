@@ -6,4 +6,9 @@ public class WikiPageCommunityToken {
     public WikiPageCommunityToken(int id) {
         this.id = id;
     }
+
+    @Override
+    public String toString() {
+        return "Community{" + id + '}';
+    }
 }
