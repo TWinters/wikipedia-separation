@@ -78,14 +78,16 @@ ENCLOSED BY '"'
 ESCAPED BY '\\'
 LINES TERMINATED BY '\n';
 ```
+Both CSV files will be used in Neo4j so be sure to remember where you stored them!
 
 #### Loading the Wikipedia data into a Graph Database
 
 Now that the CSV files have been created, it's time to load them into a database.
-1. Open Neo4J
-2. Create a new database called **wikipedia-links**.
+1. Open Neo4j.
+2. Create a new database and give it an appropriate title like **wikipedia-links**.
 3. Go to your `%NEO4J_HOME%` location and find the folder `\.Neo4jDesktop\neo4jDatabases\database-[database_identifier_code]\installation-3.3.4\import`.
-4. Put the created CSVs in this folder
+A simpler way is to open your database in Neo4j, click **Manage** and then use the **Open Folder** button, this will open the aforementioned folder. Then open the import folder.
+4. Put the created CSVs in this folder.
 5. Run the following Cypher query in Neo4J if your database was not empty *(e.g. due to previous experiments)* in order to delete all previous data:
 ```
 MATCH (n)
