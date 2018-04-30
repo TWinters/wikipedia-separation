@@ -17,48 +17,59 @@ This program is used to create the CSV file required by the graph database.
 
 ### Loading the Neo4J Graph Database data
 
-#### Converting the Wikipedia datadump
+#### Converting the Wikipedia data dump
+For this project three tables from the Wikipedia data dump will be used: _page_, _pagelinks_ and _redirect_. To download these
+tables, go to any wikimedia datadump of wikipedia, e.g. the [Dutch March 20th 2018 wikipedia datadump](https://dumps.wikimedia.org/nlwiki/20180320/), 
+and download `nlwiki-20180320-page.sql.gz` as well as `nlwiki-20180320-pagelinks.sql.gz` and `nlwiki-20180320-redirect.sql.gz`.
+To download the data dump of another language and/or date, replace _nlwiki_ and the date in the file names.
 
-Go to any wikimedia datadump of wikipedia, e.g. the [Dutch March 20th 2018 wikipedia datadump](https://dumps.wikimedia.org/nlwiki/20180320/), and download *name-date*-nlwiki-20180320-page.sql.gz as well as *name-date*-nlwiki-20180320-pagelinks.sql.gz.
-These two files are SQL data containing information about which page id has a reference to what other page title (pagelinks table), as well as what page id corresponds to which page title (page table).
+These three files each contain a data table in SQL:
+* _page_: a collection of all the pages on Wikipedia. Has columns containing id, namespace, title, etc. It also contains
+some columns with booleans like _is_redirect_ to indicate if a page is a redirect page or not.
+* _pagelinks_: a collection of all the links between pages on Wikipedia.
+* _redirect_: a collection with the redirect targets of all redirect pages. When a page is a redirect page, this table is
+used to extract the redirect target.
 
-These files have to be converted to CSV files in order to be loaded into Neo4J.
-To create the right CSV files, import both SQL files into a MySQL database, and use a program such as MySQL Workbench.
+Both _page_ and _pagelinks_ will be used in Neo4j but have to be preprocessed and converted to CSV files first.
+To create the right CSV files, import all three SQL files into a MySQL database, and use a program such as MySQL Workbench.
 
-Because the page table contains a lot of duplicates and redundant tables, this table has to be filtered first.
-Use the following queries to do this with *$SCHEME_NAME* the chosen name for the scheme:
+An intermediary table _pagelinks_with_rd_ will be created. In this table only pages with namespace 0 will be used and every
+occurrence of a redirect page will be replace by its redirect target. In order to create this table, use the following query:
 ```
-CREATE TABLE $SCHEME_NAME.page_filtered AS
-    SELECT p.page_id, p.page_title
-    FROM $SCHEME_NAME.page AS p
-    WHERE p.page_is_redirect = 0
-        AND p.page_namespace = 0;
-ALTER TABLE $SCHEME_NAME.page_filtered ADD PRIMARY KEY (page_id);
-
+CREATE TABLE nlwiki.pagelinks_with_rd AS
+SELECT DISTINCT temp2.pl_from as from_id, p2.page_id as to_id
+FROM 
+    (SELECT pl.pl_from,
+            temp.page_is_redirect,
+            IF(temp.page_is_redirect = 0, temp.page_title_direct, temp.page_title_redirect) as page_title
+    FROM nlwiki.pagelinks AS pl
+    INNER JOIN
+        (SELECT p.page_title as page_title_direct, p.page_is_redirect, rd.rd_title as page_title_redirect
+        FROM (SELECT * FROM nlwiki.page WHERE page_namespace = 0)  AS p
+        LEFT JOIN nlwiki.redirect AS rd
+        ON p.page_id = rd.rd_from
+        WHERE page_namespace = 0)
+        AS temp
+    ON pl.pl_title = temp.page_title_direct
+    ORDER by pl_from)
+    AS temp2
+INNER JOIN
+    (SELECT * FROM nlwiki.page WHERE page_namespace = 0) AS p2 
+    ON p2.page_title = temp2.page_title
 ```
-The last query makes a primary key of the page ID. 
-
-Once the table page_filtered has been made, it is advised to add an index on page_title as this will speed up the following
-queries significantly. To add the index use the following query:
-```
-ALTER TABLE $SCHEME_NAME.page_filtered ADD INDEX(page_title);
-```
-
-With the added index, a clean table containing all links can now be made. In order to store this table, the CSV format is used.
-Use the following query to make the table and to store it in a CSV file.
-Note: the *outfile* location might need to be updated depending on where your MySQL database has access to files 
-
-```
-SELECT l.pl_from AS from_id, p.page_id AS to_id
+This query first does a left on a filtered page table (with namespace 0) and the redirect table. Then an inner join is used
+on this table and the pagelinks table. The pagelinks then contains links in which each target is the original one or a
+replaced one if the original one was a redirect. To store this table in CSV format, use the next query:
+````
+SELECT * 
 INTO OUTFILE 'C:/ProgramData/MySQL/MySQL Server 5.7/Uploads/page_links.csv'
 FIELDS TERMINATED BY ','
-ENCLOSED BY '"'
 ESCAPED BY '\\'
 LINES TERMINATED BY '\n'
-FROM nlwiki.pagelinks AS l
-INNER JOIN $SCHEME_NAME.page_filtered AS p ON p.page_title=l.pl_title
-```
-Then use the following query to store the page titles in CSV format:
+FROM nlwiki.pagelinks_with_rd
+````
+When the `page_links.csv` is created, the `page_titles.csv` file containing the page_titles table can be generated.
+Use the following query to store the page titles in CSV format:
 ```
 SELECT page_id, page_title FROM $SCHEME_NAME.page
 INTO OUTFILE 'C:/ProgramData/MySQL/MySQL Server 5.7/Uploads/page_titles.csv'
