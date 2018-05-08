@@ -130,15 +130,55 @@ For example, possible program arguments are:
 `-db_login neo4j -db_pw admin -from Katholieke_Universiteit_Leuven -to Adolf_Hitler`
 
 
-## Louvain community detection 
+## Louvain Modularity
+To find communities within the Dutch wikipedia dataset we'll be using Louvain Modularity.
+Due to the size of our dataset this will be done in a distributed fashion with the help of Amazon Web Service EMR.
 
-### Export Data
-http://sotera.github.io/distributed-graph-analytics/FAQ/#how-data
+### Creating a Spark cluster on AWS EMR
+When creating a cluster quickly the software required to run the Sotera code that we are utilizing is:
+```
+Spark: Spark 2.3.0 on Hadoop 2.8.3 YARN with Ganglia 3.7.2 and Zeppelin 0.7.3
+```
+And adding a EC2 key pair to allow for ssh to connect to the server.
 
-### Apache Spark on Amazon EMR
 https://aws.amazon.com/blogs/aws/new-apache-spark-on-amazon-emr/
 
 https://docs.aws.amazon.com/emr/latest/ReleaseGuide/emr-spark.html
+
+### Setting up
+To avoid a common port issue, you can use to following steps.
+
+    1. Go to EC2 console
+    2. Click Instances on left
+    3. Select your instance (Master node in our case)
+    4. In the Description tab, locate 'Security Groups' and click the available group link
+    5. Click 'Edit' button on 'Inbound' tab.
+    6. Click 'Add Rule' and select SSH for type, Port Range 22, and Source Anywhere.
+
+Now to securly copy the required files to the server:
+
+Copy Dist folder:
+```
+pscp -i "C:\Users\***\Wikipedia-ALSSN.ppk" -r dga-graphx/build/dist hadoop@ec2-xx-xxx-xxx-xxx.eu-west-1.compute.amazonaws.com:./ 
+```
+
+Copy Page_links.csv:
+```
+pscp -i "C:\Users\***\Wikipedia-ALSSN.ppk" page_links.csv hadoop@ec2-xx-xxx-xxx-xxx.eu-west-1.compute.amazonaws.com:./page_links.csv
+```
+
+Copy to HDFS:
+```
+hdfs dfs -mkdir -p /tmp/dga/louvain/input/
+hdfs dfs -copyFromLocal page_links.csv /tmp/dga/louvain/input/
+```
+
+Run analytics:
+```
+cd /dist/lib/
+
+./dga-graphx louvain -i hdfs://master-ip-address/tmp/dga/louvain/input/page_links.csv -o hdfs://master-ip-address/tmp/dga/louvain/output/ -s /opt/spark -n LouvainModLinks -m spark://spark.master.url:7077 --S spark.executor.memory=30g --ca parallelism=378 --S spark.worker.timeout=400 --S spark.cores.max=126
+```
 
 ### Distributed Graph Analytics
 http://sotera.github.io/distributed-graph-analytics/
