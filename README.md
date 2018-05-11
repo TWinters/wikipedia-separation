@@ -201,7 +201,7 @@ MERGE (com:Community { id: toInteger(line[0])})
 ```
 CREATE CONSTRAINT ON (com:Community) ASSERT com.id IS UNIQUE
 ```
-
+To load the links between pages and a cluster of the first file
 ```
 USING PERIODIC COMMIT 500
 LOAD CSV FROM 'file:///output_communities_1.csv' AS line
@@ -209,5 +209,12 @@ MATCH (page1:Page{id: toInteger(line[0])}),
 (com:Community{id: toInteger(line[1])})
 CREATE (page1)-[:PART_OF_COM]->(com)
 ```
-
+To load the links between pages and a cluster of the other files
+```
+USING PERIODIC COMMIT 500
+LOAD CSV FROM 'file:///output_communities_3.csv' AS line
+MATCH (page1:Page{id: toInteger(line[0])}),
+(com:Community{id: toInteger(line[1])})
+MERGE (page1)-[:PART_OF_COM]->(com)
+```
 
