@@ -185,10 +185,17 @@ http://sotera.github.io/distributed-graph-analytics/
 http://sotera.github.io/distributed-graph-analytics/louvain/example/graphx/
 
 #### Loading the clusters into a Graph Database
+To load the first file with cluster ids
 ```
 USING PERIODIC COMMIT 500
 LOAD CSV FROM 'file:///overview_communities_1.csv' AS line
 CREATE (com:Community { id: toInteger(line[0])})
+```
+To load the other files with cluster ids
+```
+USING PERIODIC COMMIT 500
+LOAD CSV FROM 'file:///overview_communities_3.csv' AS line
+MERGE (com:Community { id: toInteger(line[0])})
 ```
 
 ```
