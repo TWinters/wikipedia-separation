@@ -42,7 +42,7 @@ FROM
     (SELECT pl.pl_from,
             temp.page_is_redirect,
             IF(temp.page_is_redirect = 0, temp.page_title_direct, temp.page_title_redirect) as page_title
-    FROM nlwiki.pagelinks AS pl
+    FROM (SELECT * FROM nlwiki.pagelinks AS pl2 LEFT JOIN nlwiki.page AS p3 ON pl2.pl_from = p3.page_id WHERE p3.page_namespace = 0) AS pl
     INNER JOIN
         (SELECT p.page_title as page_title_direct, p.page_is_redirect, rd.rd_title as page_title_redirect
         FROM (SELECT * FROM nlwiki.page WHERE page_namespace = 0)  AS p
