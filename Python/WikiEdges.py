@@ -1,6 +1,55 @@
-import pprint
 import operator
-# new_file = open("./overview_communities.txt", "w")
+import matplotlib.pyplot as plt
+
+
+def plot_degree_distribution(input_file):
+    xs = []
+    ys = []
+    with open(input_file) as infile:
+        for line in infile:
+            values = line.split(sep="\t")
+            xs.append(int(values[0]))
+            ys.append(int(values[1]))
+    ax = plt.subplot(111)
+    ax.set_yscale("log")
+    ax.set_ylim(ymin=1, ymax=1000000)
+    ax.set_xlim(xmin=0, xmax=1000)
+    plt.semilogy(xs[:1000], ys[:1000])
+    plt.title('Degree distribution')
+    plt.grid(True)
+    plt.show()
+
+
+def plot_incoming_outgoing(input_file):
+    incoming_dict = {}
+    outgoing_dict = {}
+    dicts = [outgoing_dict, incoming_dict]
+    with open(input_file, 'r') as infile:
+        for line in infile:
+            values = line.split(sep=",")
+            for i, v in enumerate(values):
+                v = int(v)
+                if v not in dicts[i]:
+                    dicts[i][v] = 1
+                else:
+                    dicts[i][v] += 1
+
+    print("Id = {}".format(max(outgoing_dict.items(), key=operator.itemgetter(1))))
+    print("Id = {}".format(max(incoming_dict.items(), key=operator.itemgetter(1))))
+    key_list = incoming_dict.keys()
+    tuple_list = []
+    for key in sorted(key_list):
+        if key in outgoing_dict.keys():
+            tuple_list.append((outgoing_dict[key], incoming_dict[key]))
+
+    x, y = zip(*tuple_list)
+    ax = plt.subplot(111)
+    ax.set_yscale("log")
+    ax.set_xscale("log")
+    ax.set_ylim(ymin=1, ymax=1000000)
+    ax.set_xlim(xmin=1, xmax=1000000)
+    plt.scatter(x, y)
+    plt.show()
 
 
 def print_out_communities(input_file, minimum):
@@ -43,9 +92,12 @@ def compute_degree_mode(input_file):
                 else:
                     degree_dict[v] += 1
 
-    print("Id = {}".format(max(degree_dict.items(), key=operator.itemgetter(1))[0]))
+    print("Id = {}".format(max(degree_dict.items(), key=operator.itemgetter(1))))
     list_of_degrees = list(degree_dict.values())
-    current_d = length_streak = mode = longest_streak = 0
+    current_d = 0
+    length_streak = 0
+    mode = 0
+    longest_streak = 0
     with open("./degree_distribution.txt", 'w') as outfile:
         outfile.write("Links\tFreq\n")
         for d in sorted(list_of_degrees):
@@ -89,4 +141,6 @@ if __name__ == "__main__":
     # compute_degree_mode("./page_links.txt")
     # print(find_max_node_id("./page_links.csv"))
     # for i in [1, 3, 8, 17]:
-    print_out_communities("output_communities.txt", minimum=5)
+    # print_out_communities("output_communities.txt", minimum=5)
+    # plot_degree_distribution("degree_distribution.txt")
+    plot_incoming_outgoing("page_links.csv")
