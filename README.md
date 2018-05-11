@@ -124,7 +124,6 @@ This program requires several arguments given with the command line, namely:
 | -db_pw | The password of the Neo4J database. |
 | -from | The Wikipedia page to start from. |
 | -to | The goal Wikipedia page to end on and find the shortest path to.  |
-| ---------------------- | ------------------------- |
 
 For example, possible program arguments are:
 `-db_login neo4j -db_pw admin -from Katholieke_Universiteit_Leuven -to Adolf_Hitler`
