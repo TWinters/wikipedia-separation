@@ -10,16 +10,12 @@ import com.beust.jcommander.JCommander;
 import org.neo4j.driver.v1.exceptions.AuthenticationException;
 
 import javax.swing.*;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class WikipediaSeperationGUI {
     private JTextField txtFrom;
     private JTextField txtTo;
-    private JList lstClusterWhitelist;
-    private JList lstClusterBlacklist;
-    private JButton btnToBlacklist;
+    private JList<WikiCommunityToken> lstClusterBlacklist;
     private JButton btnToWhiteList;
     private JButton btnCalculateShortestPath;
     private JPanel mainPanel;
@@ -28,6 +24,7 @@ public class WikipediaSeperationGUI {
     private JTextField txtNeo4jURI;
     private JPasswordField txtNeo4jPassword;
     private JButton updateConnectionButton;
+    private JButton viewCommunityButton;
 
     //region Initialisation
     private final IWikipediaSeparationFacade facade;
@@ -40,10 +37,17 @@ public class WikipediaSeperationGUI {
 
         // Linking buttons
         btnCalculateShortestPath.addActionListener(x -> calculateShortestPath());
-        btnToBlacklist.addActionListener(x -> addSelectionToBlacklist());
-        btnToWhiteList.addActionListener(x -> addSelectionToWhitelist());
         updateConnectionButton.addActionListener(x -> updateNeo4jConnection(true));
+
+        btnToWhiteList.addActionListener(x -> addSelectionToWhitelist());
+        facade.addBlockListener(x->updateBlockedCommunities());
+        facade.addUnblockListener(x->updateBlockedCommunities());
+        updateBlockedCommunities();
+
+        initialiseFrame();
+        viewCommunityButton.addActionListener(x->openSelectedCommunities());
     }
+
 
     private void setDefaultLinkArguments(LinksFinderArguments linkArguments) {
         this.txtFrom.setText(linkArguments.getFrom());
@@ -51,6 +55,13 @@ public class WikipediaSeperationGUI {
     }
 
     //endregion
+
+
+    private void updateBlockedCommunities() {
+        DefaultListModel<WikiCommunityToken> defaultListModel = new DefaultListModel<>();
+        facade.getBlockedCommunities().forEach(defaultListModel::addElement);
+        lstClusterBlacklist.setModel(defaultListModel);
+    }
 
 
     //region Calculating shortest path
@@ -61,8 +72,7 @@ public class WikipediaSeperationGUI {
         btnCalculateShortestPath.setEnabled(false);
         new Thread(() -> {
             if (checkValidnessWithDialog(from) && checkValidnessWithDialog(to)) {
-                List<WikiCommunityToken> blockedCommunities = new ArrayList<>(); //TODO
-                Collection<WikiPath> paths = facade.calculateShortestPath(from, to, blockedCommunities);
+                Collection<WikiPath> paths = facade.calculateShortestPath(from, to, facade.getBlockedCommunities());
 
                 if (paths.isEmpty()) {
                     JOptionPane.showMessageDialog(mainPanel,
@@ -95,12 +105,14 @@ public class WikipediaSeperationGUI {
 
     //region Cluster filtering
     private void addSelectionToWhitelist() {
-        // TODO
+        lstClusterBlacklist.getSelectedValuesList().forEach(facade::unblockCommunity);
     }
 
-    private void addSelectionToBlacklist() {
-        //TODO
+    private void openSelectedCommunities() {
+        lstClusterBlacklist.getSelectedValuesList().forEach(community->new CommunityViewer(facade, community));
     }
+
+
 
 
     //region updating Neo4J connection
@@ -130,7 +142,7 @@ public class WikipediaSeperationGUI {
     //endregion
 
     //region Running the GUI
-    public void run() {
+    public void initialiseFrame() {
         JFrame frame = new JFrame("Wikipedia Seperation GUI");
         frame.setContentPane(this.mainPanel);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -154,7 +166,6 @@ public class WikipediaSeperationGUI {
 
         WikipediaSeperationGUI gui = new WikipediaSeperationGUI(facade);
         gui.setDefaultLinkArguments(linkArguments);
-        gui.run();
     }
     //endregion
 }

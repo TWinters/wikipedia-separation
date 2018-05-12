@@ -50,6 +50,8 @@ public class CommunityViewer {
                 communityFacade.unblockCommunity(community);
             }
         });
+        communityFacade.addBlockListener(x->updateBlockedButtonEnabledness());
+        communityFacade.addUnblockListener(x->updateBlockedButtonEnabledness());
     }
 
     public void updateBlockedButtonEnabledness() {

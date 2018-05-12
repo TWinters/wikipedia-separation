@@ -81,7 +81,7 @@
               </component>
             </children>
           </grid>
-          <grid id="8ebd5" layout-manager="GridLayoutManager" row-count="3" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+          <grid id="8ebd5" layout-manager="GridLayoutManager" row-count="4" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="10" left="10" bottom="10" right="10"/>
             <constraints>
               <tabbedpane title="Communities Filter"/>
@@ -91,56 +91,17 @@
             </properties>
             <border type="none" title=""/>
             <children>
-              <component id="237b9" class="javax.swing.JLabel">
-                <constraints>
-                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <text value="Allowed Communities"/>
-                </properties>
-              </component>
               <component id="7eb6c" class="javax.swing.JLabel">
                 <constraints>
-                  <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
                   <text value="Disallowed Communities"/>
                 </properties>
               </component>
-              <component id="508d" class="javax.swing.JButton" binding="btnToBlacklist">
-                <constraints>
-                  <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <text value="&gt;&gt;&gt;"/>
-                </properties>
-              </component>
-              <component id="8ebcb" class="javax.swing.JButton" binding="btnToWhiteList">
-                <constraints>
-                  <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <text value="&lt;&lt;&lt;"/>
-                </properties>
-              </component>
-              <scrollpane id="89ee6">
-                <constraints>
-                  <grid row="1" column="0" row-span="2" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties/>
-                <border type="none"/>
-                <children>
-                  <component id="d3d4a" class="javax.swing.JList" binding="lstClusterWhitelist">
-                    <constraints/>
-                    <properties>
-                      <model/>
-                    </properties>
-                  </component>
-                </children>
-              </scrollpane>
               <scrollpane id="18046">
                 <constraints>
-                  <grid row="1" column="2" row-span="2" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <grid row="1" column="0" row-span="2" col-span="2" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties/>
                 <border type="none"/>
@@ -153,6 +114,22 @@
                   </component>
                 </children>
               </scrollpane>
+              <component id="8ebcb" class="javax.swing.JButton" binding="btnToWhiteList">
+                <constraints>
+                  <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="Re-allow"/>
+                </properties>
+              </component>
+              <component id="e9003" class="javax.swing.JButton" binding="viewCommunityButton" default-binding="true">
+                <constraints>
+                  <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="View Community"/>
+                </properties>
+              </component>
             </children>
           </grid>
           <grid id="20075" layout-manager="GridLayoutManager" row-count="3" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">

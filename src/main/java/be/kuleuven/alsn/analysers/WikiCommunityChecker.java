@@ -41,7 +41,7 @@ public class WikiCommunityChecker implements AutoCloseable {
                         .writeTransaction(tx ->
                                 tx.run(GET_CLUSTER_OF_PAGE, parameters("id", page.getPageId())));
         if (statementResult.hasNext()) {
-            return new WikiCommunityToken(statementResult.single().get(0).asLong());
+            return new WikiCommunityToken((Long)statementResult.single().get(0).asNode().asMap().get("id"));
         } else {
             throw new IllegalArgumentException("No page with page id " + page.getPageId() + " exists.");
         }

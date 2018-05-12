@@ -13,11 +13,12 @@ import be.kuleuven.alsn.data.WikiPath;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class WikipediaSeparationFacade implements IWikipediaSeparationFacade {
     private WikiPathFinder linksFinder;
     private WikiCommunityChecker communityChecker;
-    private WikiCommunityFilter communityFilter;
+    private WikiCommunityFilter communityFilter = new WikiCommunityFilter();
     private WikiPageExistanceChecker existanceChecker;
     private Neo4jConnectionDetails neo4jConnectionDetails;
 
@@ -45,6 +46,7 @@ public class WikipediaSeparationFacade implements IWikipediaSeparationFacade {
     public Optional<Neo4jConnectionDetails> getNeo4JConnectDetails() {
         return Optional.ofNullable(neo4jConnectionDetails);
     }
+
 
     @Override
     public WikiCommunityToken getCommunityOf(WikiPageCard page) {
@@ -75,5 +77,15 @@ public class WikipediaSeparationFacade implements IWikipediaSeparationFacade {
     public boolean isBlocked(WikiCommunityToken community) {
         return communityFilter.isBlocked(community);
     }
-    //endregion
+
+    @Override
+    public void addBlockListener(Consumer<WikiCommunityToken> listener) {
+        communityFilter.addBlockListener(listener);
+    }
+
+    @Override
+    public void addUnblockListener(Consumer<WikiCommunityToken> listener) {
+        communityFilter.addUnblockListener(listener);
+    }
+    /* endregion */
 }

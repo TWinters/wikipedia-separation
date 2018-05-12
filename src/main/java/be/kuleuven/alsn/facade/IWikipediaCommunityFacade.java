@@ -6,8 +6,13 @@ import be.kuleuven.alsn.data.WikiPageWithLinksCount;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 public interface IWikipediaCommunityFacade {
+    void addBlockListener(Consumer<WikiCommunityToken> listener);
+
+    void addUnblockListener(Consumer<WikiCommunityToken> listener);
+
     WikiCommunityToken getCommunityOf(WikiPageCard page);
 
     List<WikiPageWithLinksCount> getCommunityPages(WikiCommunityToken communityId);
