@@ -33,7 +33,7 @@ public class WikipediaSeparationFacade implements IWikipediaSeparationFacade {
     public void setNeo4jConnection(Neo4jConnectionDetails neo4jArguments) {
         this.neo4jConnectionDetails = neo4jArguments;
         this.linksFinder = new WikiPathFinder(neo4jArguments);
-        this.communityChecker = new WikiCommunityChecker(neo4jArguments);
+        this.communityChecker = new CachedCommunityChecker(new WikiCommunityChecker(neo4jArguments));
         this.existanceChecker = new WikiPageExistanceChecker(neo4jArguments);
     }
 
