@@ -191,12 +191,6 @@ USING PERIODIC COMMIT 500
 LOAD CSV FROM 'file:///overview_communities_1.csv' AS line
 CREATE (com:Community { id: toInteger(line[0])})
 ```
-To load the other files with cluster ids
-```
-USING PERIODIC COMMIT 500
-LOAD CSV FROM 'file:///overview_communities_3.csv' AS line
-MERGE (com:Community { id: toInteger(line[0])})
-```
 
 ```
 CREATE CONSTRAINT ON (com:Community) ASSERT com.id IS UNIQUE
@@ -209,14 +203,7 @@ MATCH (page1:Page{id: toInteger(line[0])}),
 (com:Community{id: toInteger(line[1])})
 CREATE (page1)-[:PART_OF_COM]->(com)
 ```
-To load the links between pages and a cluster of the other files
-```
-USING PERIODIC COMMIT 500
-LOAD CSV FROM 'file:///output_communities_3.csv' AS line
-MATCH (page1:Page{id: toInteger(line[0])}),
-(com:Community{id: toInteger(line[1])})
-MERGE (page1)-[:PART_OF_COM]->(com)
-```
+
 ## Exclude communities of nodes from shortest path
 ```
 MATCH (begin:Page{title: 'Katholieke_Universiteit_Leuven'}), (end:Page{title: 'Adolf_Hitler'}), p = shortestPath((begin)-[:REFERENCES_TO*]->(end)),(com:Community{id:10}),(com2:Community{id: 159}),(com3:Community{id: 1323})
@@ -227,5 +214,13 @@ Find community of page
 ```
 MATCH (page:Page{title: 'Tweede_Wereldoorlog'})-[:PART_OF_COM]->(c)
 RETURN c
+```
+
+Find all nodes of a community and their number of incoming links
+```
+MATCH (com:Community{id:9}), (n:Page), (o:Page),(n)-[:PART_OF_COM]->(com), s = (o)-[:REFERENCES_TO]->(n) 
+WITH n, COUNT(s) AS number 
+ORDER BY number DESC 
+RETURN n,number
 ```
 
