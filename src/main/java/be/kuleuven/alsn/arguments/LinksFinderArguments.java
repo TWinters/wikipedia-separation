@@ -1,6 +1,11 @@
 package be.kuleuven.alsn.arguments;
 
+import be.kuleuven.alsn.data.WikiPageCommunityToken;
 import com.beust.jcommander.Parameter;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Arguments that are parsed by JCommander
@@ -14,6 +19,9 @@ public class LinksFinderArguments {
     @Parameter(names = "-to", description = "The goal wikipedia page to end on")
     private String to = "Adolf_Hitler";
 
+    @Parameter(names = "-blocked", description = "Communities of which nodes are not allowed to appear on the path")
+    private List<Long> blockedCommunities = new ArrayList<>();
+
 
     public String getFrom() {
         return from;
@@ -21,5 +29,8 @@ public class LinksFinderArguments {
 
     public String getTo() {
         return to;
+    }
+
+    public Collection<WikiPageCommunityToken> getBlockedCommunities() {
     }
 }
