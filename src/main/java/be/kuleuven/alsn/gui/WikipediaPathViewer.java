@@ -1,17 +1,21 @@
 package be.kuleuven.alsn.gui;
 
+import be.kuleuven.alsn.data.WikiCommunityToken;
 import be.kuleuven.alsn.data.WikiPageCard;
 import be.kuleuven.alsn.data.WikiPath;
+import be.kuleuven.alsn.facade.IWikipediaCommunityFacade;
 
 import javax.swing.*;
 
 public class WikipediaPathViewer {
+    private final IWikipediaCommunityFacade communityFacade;
     private final WikiPath path;
     private JList<WikiPageCard> lstPath;
     private JPanel mainPanel;
     private JButton viewCommunitiesButton;
 
-    public WikipediaPathViewer(WikiPath path) {
+    public WikipediaPathViewer(IWikipediaCommunityFacade communityFacade, WikiPath path) {
+        this.communityFacade = communityFacade;
         this.path = path;
         ListModel<WikiPageCard> listModel = new AbstractListModel<WikiPageCard>() {
             @Override
@@ -29,7 +33,9 @@ public class WikipediaPathViewer {
     }
 
     private void viewCommunitiesSelectedNode() {
-        System.out.println(lstPath.getSelectedValue());
+        WikiPageCard page = lstPath.getSelectedValue();
+        WikiCommunityToken community = communityFacade.getCommunityOf(page);
+        new CommunityViewer(communityFacade, community);
     }
 
     //region Running the GUI

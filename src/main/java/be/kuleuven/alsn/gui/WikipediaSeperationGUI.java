@@ -73,7 +73,7 @@ public class WikipediaSeperationGUI {
                     // Open a window for each path
                     paths.stream()
                             .peek(System.out::println)
-                            .map(WikipediaPathViewer::new)
+                            .map(path-> new WikipediaPathViewer(facade, path))
                             .forEach(WikipediaPathViewer::run);
                 }
             }
