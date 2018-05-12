@@ -11,4 +11,8 @@ public class WikiPageCommunityToken {
     public String toString() {
         return "Community{" + id + '}';
     }
+
+    public long getId() {
+        return id;
+    }
 }

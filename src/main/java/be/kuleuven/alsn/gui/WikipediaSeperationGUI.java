@@ -2,6 +2,7 @@ package be.kuleuven.alsn.gui;
 
 import be.kuleuven.alsn.arguments.LinksFinderArguments;
 import be.kuleuven.alsn.arguments.Neo4jConnectionDetails;
+import be.kuleuven.alsn.data.WikiPageCommunityToken;
 import be.kuleuven.alsn.data.WikiPath;
 import be.kuleuven.alsn.facade.IWikipediaSeparationFacade;
 import be.kuleuven.alsn.facade.WikipediaSeparationFacade;
@@ -9,7 +10,9 @@ import com.beust.jcommander.JCommander;
 import org.neo4j.driver.v1.exceptions.AuthenticationException;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class WikipediaSeperationGUI {
     private JTextField txtFrom;
@@ -58,7 +61,8 @@ public class WikipediaSeperationGUI {
         btnCalculateShortestPath.setEnabled(false);
         new Thread(() -> {
             if (checkValidnessWithDialog(from) && checkValidnessWithDialog(to)) {
-                Collection<WikiPath> paths = facade.calculateShortestPath(from, to);
+                List<WikiPageCommunityToken> blockedCommunities = new ArrayList<>(); //TODO
+                Collection<WikiPath> paths = facade.calculateShortestPath(from, to, blockedCommunities);
 
                 if (paths.isEmpty()) {
                     JOptionPane.showMessageDialog(mainPanel,

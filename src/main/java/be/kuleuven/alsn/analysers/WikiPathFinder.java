@@ -3,23 +3,33 @@ package be.kuleuven.alsn.analysers;
 import be.kuleuven.alsn.arguments.LinksFinderArguments;
 import be.kuleuven.alsn.arguments.Neo4jConnectionDetails;
 import be.kuleuven.alsn.data.WikiPageCard;
+import be.kuleuven.alsn.data.WikiPageCommunityToken;
 import be.kuleuven.alsn.data.WikiPath;
 import com.beust.jcommander.JCommander;
+import com.google.common.collect.ImmutableMap;
 import org.neo4j.driver.internal.InternalPath;
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.StatementResult;
+import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.types.Entity;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
 import static org.neo4j.driver.v1.Values.parameters;
+import static org.neo4j.driver.v1.Values.value;
 
 public class WikiPathFinder implements AutoCloseable {
 
+    private static final String shortestPathQuery = "MATCH (begin:Page { title: $from }),(end:Page { title: $to }), p = shortestPath((begin)-[:REFERENCES_TO*]->(end)) RETURN p";
+    // TODO: Optimaliseerbaar door gebruik van volgende query: 'MATCH (s) WHERE ID(s) in [19, 3309035] RETURN ID(s),s.title' voor meerdere nodes
+    private static final String nodeNameQuery = "MATCH (s) WHERE ID(s) = $id RETURN s.title";
     private final Driver driver;
 
     private WikiPathFinder(Driver driver) {
@@ -30,24 +40,97 @@ public class WikiPathFinder implements AutoCloseable {
         this(neo4jArguments.createConnection());
     }
 
+    public static void main(String... args) throws Exception {
+        Neo4jConnectionDetails neo4jArguments = new Neo4jConnectionDetails();
+        LinksFinderArguments linkArguments = new LinksFinderArguments();
+
+        JCommander.newBuilder()
+                .addObject(neo4jArguments)
+                .addObject(linkArguments)
+                .build()
+                .parse(args);
+
+
+        WikiPathFinder finder = new WikiPathFinder(neo4jArguments);
+        System.out.println(
+                finder.findShortestPath(linkArguments.getFrom(), linkArguments.getTo(), linkArguments.getBlockedCommunities())
+                        .stream().map(WikiPath::toString)
+                        .collect(Collectors.joining("\n")));
+    }
+
     @Override
     public void close() throws Exception {
         driver.close();
     }
 
-    private static final String shortestPathQuery = "MATCH (begin:Page { title: $from }),(end:Page { title: $to }), p = shortestPath((begin)-[:REFERENCES_TO*]->(end)) RETURN p";
+    public Collection<WikiPath> findShortestPath(
+            final String from, final String to, Collection<WikiPageCommunityToken> blockedCommunities) {
+        if (blockedCommunities.isEmpty()) {
+            return findShortestPathSimple(from, to);
+        } else {
+            return findShortestPathExcludingClusters(from, to, blockedCommunities);
+        }
+    }
 
-    public Collection<WikiPath> findShortestPath(final String from, final String to) {
+    private Collection<WikiPath> runPathFindingQuery(String query, Value parameters) {
         return extractPathsFromStatementResult(
                 driver.session()
                         .writeTransaction(tx ->
-                                tx.run(shortestPathQuery, parameters("from", from, "to", to))));
+                                tx.run(query, parameters)));
 
     }
 
-    // TODO: Optimaliseerbaar door gebruik van volgende query: 'MATCH (s) WHERE ID(s) in [19, 3309035] RETURN ID(s),s.title' voor meerdere nodes
-    private static final String nodeNameQuery = "MATCH (s) WHERE ID(s) = $id RETURN s.title";
+    /**
+     * Finds shortest path through the graph without blocking any cluster
+     */
+    private Collection<WikiPath> findShortestPathSimple(final String from, final String to) {
+        return runPathFindingQuery(shortestPathQuery, parameters("from", from, "to", to));
 
+    }
+
+    /**
+     * Finds shortest path though the graph but blocks nodes belonging to given communities
+     */
+    private Collection<WikiPath> findShortestPathExcludingClusters(
+            String from, final String to, Collection<WikiPageCommunityToken> blockedCommunities) {
+        List<WikiPageCommunityToken> tokens = new ArrayList<>(blockedCommunities);
+        String query = createShortestPathQueryForCommunities(tokens);
+        Value parameters = createParametersForCommunities(from, to, tokens);
+        return runPathFindingQuery(query, parameters);
+
+
+    }
+
+    private String createShortestPathQueryForCommunities(List<WikiPageCommunityToken> blockedCommunities) {
+        String query = "MATCH (begin:Page{title: $from})," +
+                "(end:Page{title: $to})," +
+                "p = shortestPath((begin)-[:REFERENCES_TO*]->(end))," +
+                IntStream.range(0, blockedCommunities.size())
+                        .mapToObj(i -> "(com" + i + ":Community{id:" + blockedCommunities.get(i) + "})")
+                        .collect(Collectors.joining(",")) + " " +
+                "WHERE NONE (n IN FILTER (n IN nodes (p) WHERE NOT(n = begin OR n = end)) " +
+                "WHERE(" +
+                IntStream.range(0, blockedCommunities.size())
+                        .mapToObj(i -> "EXISTS ((n) -[:PART_OF_COM]->(com" + i + "))")
+                        .collect(Collectors.joining(" OR "))
+                +
+                "RETURN p ";
+        return query;
+    }
+
+    private Value createParametersForCommunities(String from, String to,
+                                                 List<WikiPageCommunityToken> blockedCommunities) {
+        ImmutableMap.Builder<String, Object> b = ImmutableMap.builder();
+
+        b.put("from", from);
+        b.put("to", to);
+        IntStream.range(0, blockedCommunities.size())
+                .forEach(
+                        i -> b.put("com" + i, blockedCommunities.get(i).getId())
+                );
+        return value(b.build());
+
+    }
 
     private Collection<WikiPath> extractPathsFromStatementResult(StatementResult result) {
         // Using a set to filter out duplicate paths (due to duplicate IDs for pages)
@@ -75,22 +158,5 @@ public class WikiPathFinder implements AutoCloseable {
                 .writeTransaction(tx ->
                         tx.run(nodeNameQuery, parameters("id", nodeId)))
                 .single().get(0).asString());
-    }
-
-    public static void main(String... args) throws Exception {
-        Neo4jConnectionDetails neo4jArguments = new Neo4jConnectionDetails();
-        LinksFinderArguments linkArguments = new LinksFinderArguments();
-
-        JCommander.newBuilder()
-                .addObject(neo4jArguments)
-                .addObject(linkArguments)
-                .build()
-                .parse(args);
-
-
-        WikiPathFinder finder = new WikiPathFinder(neo4jArguments);
-        System.out.println(finder.findShortestPath(linkArguments.getFrom(), linkArguments.getTo())
-                .stream().map(WikiPath::toString)
-                .collect(Collectors.joining("\n")));
     }
 }

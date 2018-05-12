@@ -5,7 +5,6 @@ import com.beust.jcommander.Parameter;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Arguments that are parsed by JCommander
@@ -20,7 +19,7 @@ public class LinksFinderArguments {
     private String to = "Adolf_Hitler";
 
     @Parameter(names = "-blocked", description = "Communities of which nodes are not allowed to appear on the path")
-    private List<Long> blockedCommunities = new ArrayList<>();
+    private Collection<WikiPageCommunityToken> blockedCommunities = new ArrayList<>();
 
 
     public String getFrom() {
@@ -32,5 +31,6 @@ public class LinksFinderArguments {
     }
 
     public Collection<WikiPageCommunityToken> getBlockedCommunities() {
+        return blockedCommunities;
     }
 }

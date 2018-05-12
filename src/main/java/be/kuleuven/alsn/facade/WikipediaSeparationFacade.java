@@ -3,6 +3,7 @@ package be.kuleuven.alsn.facade;
 import be.kuleuven.alsn.analysers.WikiPageExistanceChecker;
 import be.kuleuven.alsn.analysers.WikiPathFinder;
 import be.kuleuven.alsn.arguments.Neo4jConnectionDetails;
+import be.kuleuven.alsn.data.WikiPageCommunityToken;
 import be.kuleuven.alsn.data.WikiPath;
 
 import java.util.Collection;
@@ -20,8 +21,9 @@ public class WikipediaSeparationFacade implements IWikipediaSeparationFacade {
     }
 
     @Override
-    public Collection<WikiPath> calculateShortestPath(String from, String to) {
-        return linksFinder.findShortestPath(from, to);
+    public Collection<WikiPath> calculateShortestPath(String from, String to,
+                                                      Collection<WikiPageCommunityToken> blockedCommunities) {
+        return linksFinder.findShortestPath(from, to, blockedCommunities);
     }
 
     @Override

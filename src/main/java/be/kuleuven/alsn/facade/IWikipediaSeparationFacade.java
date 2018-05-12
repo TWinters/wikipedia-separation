@@ -1,6 +1,7 @@
 package be.kuleuven.alsn.facade;
 
 import be.kuleuven.alsn.arguments.Neo4jConnectionDetails;
+import be.kuleuven.alsn.data.WikiPageCommunityToken;
 import be.kuleuven.alsn.data.WikiPath;
 
 import java.util.Collection;
@@ -19,7 +20,8 @@ public interface IWikipediaSeparationFacade {
 
     List<Long> getClusters();
 
-    Collection<WikiPath> calculateShortestPath(String from, String to);
+    Collection<WikiPath> calculateShortestPath(String from, String to,
+                                               Collection<WikiPageCommunityToken> blockedCommunities);
 
     boolean isValidPage(String page);
 }
