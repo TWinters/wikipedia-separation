@@ -6,6 +6,7 @@ import be.kuleuven.alsn.data.WikiPath;
 import be.kuleuven.alsn.facade.IWikipediaCommunityFacade;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
 
 public class WikipediaPathViewer {
     private final IWikipediaCommunityFacade communityFacade;
@@ -34,10 +35,15 @@ public class WikipediaPathViewer {
         viewCommunitiesButton.addActionListener(x -> viewCommunitySelectedNode());
         recalculateButton.addActionListener(x -> {
             recalculateButton.setEnabled(false);
-            recalculatePath.run();
-            recalculateButton.setEnabled(true);
+            SwingUtilities.invokeLater(() -> {
+                recalculatePath.run();
+                recalculateButton.setEnabled(true);
+            });
         });
-        blockPageCommunityButton.addActionListener(x -> blockCommunitySelectedNode());
+        blockPageCommunityButton.addActionListener(x -> toggleBlockStatus());
+        communityFacade.addBlockListener(x -> updateSelected());
+        communityFacade.addUnblockListener(x -> updateSelected());
+        lstPath.addListSelectionListener(this::updateSelected);
     }
 
     private void viewCommunitySelectedNode() {
@@ -47,11 +53,28 @@ public class WikipediaPathViewer {
         });
     }
 
-    private void blockCommunitySelectedNode() {
-        lstPath.getSelectedValuesList().forEach(page -> {
-            WikiCommunityToken community = communityFacade.getCommunityOf(page);
+    private void toggleBlockStatus() {
+        WikiPageCard page = lstPath.getSelectedValue();
+        WikiCommunityToken community = communityFacade.getCommunityOf(page);
+        if (communityFacade.isBlocked(community)) {
+            communityFacade.unblockCommunity(community);
+        } else {
             communityFacade.blockCommunity(community);
-        });
+        }
+
+    }
+
+    private void updateSelected() {
+        blockPageCommunityButton.setEnabled(!lstPath.isSelectionEmpty());
+        if (communityFacade.isBlocked(communityFacade.getCommunityOf(lstPath.getSelectedValue()))) {
+            blockPageCommunityButton.setText("Unblock Page Community");
+        } else {
+            blockPageCommunityButton.setText("Block Page Community");
+        }
+    }
+
+    private void updateSelected(ListSelectionEvent listSelectionEvent) {
+        updateSelected();
     }
 
     //region Running the GUI
@@ -63,4 +86,5 @@ public class WikipediaPathViewer {
         frame.setVisible(true);
     }
     //endregion
+
 }
