@@ -2,7 +2,7 @@ package be.kuleuven.alsn.analysers;
 
 import be.kuleuven.alsn.arguments.Neo4jConnectionDetails;
 import be.kuleuven.alsn.data.WikiCommunityToken;
-import be.kuleuven.alsn.data.WikiPageCard;
+import be.kuleuven.alsn.data.WikiPageWithLinksCount;
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.StatementResult;
@@ -63,23 +63,7 @@ public class WikiCommunityChecker implements AutoCloseable {
         return result;
     }
 
-    private static class WikiPageWithLinksCount {
-        private final WikiPageCard card;
-        private final int incomingLinks;
 
-        public WikiPageWithLinksCount(WikiPageCard card, int incomingLinks) {
-            this.card = card;
-            this.incomingLinks = incomingLinks;
-        }
-
-        public WikiPageCard getCard() {
-            return card;
-        }
-
-        public int getIncomingLinks() {
-            return incomingLinks;
-        }
-    }
 
 
 }

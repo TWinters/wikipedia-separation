@@ -6,9 +6,11 @@ import be.kuleuven.alsn.analysers.WikiPageExistanceChecker;
 import be.kuleuven.alsn.analysers.WikiPathFinder;
 import be.kuleuven.alsn.arguments.Neo4jConnectionDetails;
 import be.kuleuven.alsn.data.WikiCommunityToken;
+import be.kuleuven.alsn.data.WikiPageWithLinksCount;
 import be.kuleuven.alsn.data.WikiPath;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 public class WikipediaSeparationFacade implements IWikipediaSeparationFacade {
@@ -41,6 +43,11 @@ public class WikipediaSeparationFacade implements IWikipediaSeparationFacade {
     @Override
     public Optional<Neo4jConnectionDetails> getNeo4JConnectDetails() {
         return Optional.ofNullable(neo4jConnectionDetails);
+    }
+
+    @Override
+    public List<WikiPageWithLinksCount> getCommunityPages(long communityId) {
+        return communityChecker.getCommunityPages(communityId);
     }
 
     @Override

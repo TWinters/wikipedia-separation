@@ -7,7 +7,7 @@ import be.kuleuven.alsn.data.WikiPath;
 import java.util.Collection;
 import java.util.Optional;
 
-public interface IWikipediaSeparationFacade {
+public interface IWikipediaSeparationFacade extends IWikipediaCommunityFacade {
 
     default void setNeo4jConnection(String neo4jURI, String neo4jUsername, String neo4jPassword) {
         this.setNeo4jConnection(new Neo4jConnectionDetails(neo4jURI, neo4jUsername, neo4jPassword));
@@ -17,14 +17,10 @@ public interface IWikipediaSeparationFacade {
 
     Optional<Neo4jConnectionDetails> getNeo4JConnectDetails();
 
-    Collection<WikiCommunityToken> getBlockedCommunities();
-
-    void blockCommunity(WikiCommunityToken token);
-
-    void unblockCommunity(WikiCommunityToken token);
 
     Collection<WikiPath> calculateShortestPath(String from, String to,
                                                Collection<WikiCommunityToken> blockedCommunities);
 
     boolean isValidPage(String page);
+
 }
