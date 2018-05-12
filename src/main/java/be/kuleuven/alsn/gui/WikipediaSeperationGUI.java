@@ -142,7 +142,7 @@ public class WikipediaSeperationGUI {
 
     //region Running the GUI
     public void initialiseFrame() {
-        JFrame frame = new JFrame("Wikipedia Seperation GUI");
+        JFrame frame = new JFrame("Wikipedia Separation GUI");
         frame.setContentPane(this.mainPanel);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.pack();

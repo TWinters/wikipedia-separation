@@ -1,9 +1,6 @@
 package be.kuleuven.alsn.facade;
 
-import be.kuleuven.alsn.analysers.WikiCommunityChecker;
-import be.kuleuven.alsn.analysers.WikiCommunityFilter;
-import be.kuleuven.alsn.analysers.WikiPageExistanceChecker;
-import be.kuleuven.alsn.analysers.WikiPathFinder;
+import be.kuleuven.alsn.analysers.*;
 import be.kuleuven.alsn.arguments.Neo4jConnectionDetails;
 import be.kuleuven.alsn.data.WikiCommunityToken;
 import be.kuleuven.alsn.data.WikiPageCard;
@@ -17,7 +14,7 @@ import java.util.function.Consumer;
 
 public class WikipediaSeparationFacade implements IWikipediaSeparationFacade {
     private WikiPathFinder linksFinder;
-    private WikiCommunityChecker communityChecker;
+    private IWikiCommunityChecker communityChecker;
     private WikiCommunityFilter communityFilter = new WikiCommunityFilter();
     private WikiPageExistanceChecker existanceChecker;
     private Neo4jConnectionDetails neo4jConnectionDetails;

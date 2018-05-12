@@ -14,7 +14,7 @@ import java.util.Map;
 
 import static org.neo4j.driver.v1.Values.parameters;
 
-public class WikiCommunityChecker implements AutoCloseable {
+public class WikiCommunityChecker implements AutoCloseable, IWikiCommunityChecker {
 
     private static final String GET_CLUSTER_OF_PAGE = "MATCH (page:Page{id: $id})-[:PART_OF_COM]->(c) RETURN c";
     private static final String GET_PAGES_OF_CLUSTER = "MATCH (com:Community{id:$id}), (n:Page), (o:Page),(n)-[:PART_OF_COM]->(com), s = (o)-[:REFERENCES_TO]->(n) \n" +
@@ -36,6 +36,7 @@ public class WikiCommunityChecker implements AutoCloseable {
         driver.close();
     }
 
+    @Override
     public WikiCommunityToken getCommunityOf(WikiPageCard page) {
         StatementResult statementResult =
                 driver.session()
@@ -48,6 +49,7 @@ public class WikiCommunityChecker implements AutoCloseable {
         }
     }
 
+    @Override
     public List<WikiPageWithLinksCount> getCommunityPages(WikiCommunityToken communityId) {
         StatementResult statementResult =
                 driver.session()
