@@ -6,7 +6,6 @@ import be.kuleuven.alsn.data.WikiPath;
 import be.kuleuven.alsn.facade.IWikipediaCommunityFacade;
 
 import javax.swing.*;
-import java.util.stream.Collectors;
 
 public class WikipediaPathViewer {
     private final IWikipediaCommunityFacade communityFacade;
@@ -14,8 +13,10 @@ public class WikipediaPathViewer {
     private JList<WikiPageCard> lstPath;
     private JPanel mainPanel;
     private JButton viewCommunitiesButton;
+    private JButton blockPageCommunityButton;
+    private JButton recalculateButton;
 
-    public WikipediaPathViewer(IWikipediaCommunityFacade communityFacade, WikiPath path) {
+    public WikipediaPathViewer(IWikipediaCommunityFacade communityFacade, WikiPath path, Runnable recalculatePath) {
         this.communityFacade = communityFacade;
         this.path = path;
         ListModel<WikiPageCard> listModel = new AbstractListModel<WikiPageCard>() {
@@ -30,17 +31,27 @@ public class WikipediaPathViewer {
             }
         };
         this.lstPath.setModel(listModel);
-        viewCommunitiesButton.addActionListener(x -> viewCommunitiesSelectedNode());
+        viewCommunitiesButton.addActionListener(x -> viewCommunitySelectedNode());
+        recalculateButton.addActionListener(x -> {
+            recalculateButton.setEnabled(false);
+            recalculatePath.run();
+            recalculateButton.setEnabled(true);
+        });
+        blockPageCommunityButton.addActionListener(x -> blockCommunitySelectedNode());
     }
 
-    private void viewCommunitiesSelectedNode() {
-        WikiPageCard page = lstPath.getSelectedValue();
-        System.out.println(path.getPages().stream().map(WikiPageCard::getPageId)
-                .map(e->e+"")
-                .collect(Collectors.joining(",")));
-        System.out.println("Viewing community of " + page + ":" +page.getPageId());
-        WikiCommunityToken community = communityFacade.getCommunityOf(page);
-        new CommunityViewer(communityFacade, community);
+    private void viewCommunitySelectedNode() {
+        lstPath.getSelectedValuesList().forEach(page -> {
+            WikiCommunityToken community = communityFacade.getCommunityOf(page);
+            SwingUtilities.invokeLater(() -> new CommunityViewer(communityFacade, community));
+        });
+    }
+
+    private void blockCommunitySelectedNode() {
+        lstPath.getSelectedValuesList().forEach(page -> {
+            WikiCommunityToken community = communityFacade.getCommunityOf(page);
+            communityFacade.blockCommunity(community);
+        });
     }
 
     //region Running the GUI

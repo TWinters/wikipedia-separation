@@ -1,5 +1,7 @@
 package be.kuleuven.alsn.data;
 
+import java.util.Objects;
+
 public class WikiCommunityToken {
     private final long id;
 
@@ -14,5 +16,19 @@ public class WikiCommunityToken {
 
     public long getId() {
         return id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        WikiCommunityToken that = (WikiCommunityToken) o;
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(id);
     }
 }
