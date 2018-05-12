@@ -42,7 +42,7 @@ FROM
     (SELECT pl.pl_from,
             temp.page_is_redirect,
             IF(temp.page_is_redirect = 0, temp.page_title_direct, temp.page_title_redirect) as page_title
-    FROM nlwiki.pagelinks AS pl
+    FROM (SELECT * FROM nlwiki.pagelinks AS pl2 LEFT JOIN nlwiki.page AS p3 ON pl2.pl_from = p3.page_id WHERE p3.page_namespace = 0) AS pl
     INNER JOIN
         (SELECT p.page_title as page_title_direct, p.page_is_redirect, rd.rd_title as page_title_redirect
         FROM (SELECT * FROM nlwiki.page WHERE page_namespace = 0)  AS p
@@ -124,7 +124,6 @@ This program requires several arguments given with the command line, namely:
 | -db_pw | The password of the Neo4J database. |
 | -from | The Wikipedia page to start from. |
 | -to | The goal Wikipedia page to end on and find the shortest path to.  |
-| ---------------------- | ------------------------- |
 
 For example, possible program arguments are:
 `-db_login neo4j -db_pw admin -from Katholieke_Universiteit_Leuven -to Adolf_Hitler`
@@ -184,3 +183,49 @@ cd /dist/lib/
 http://sotera.github.io/distributed-graph-analytics/
 
 http://sotera.github.io/distributed-graph-analytics/louvain/example/graphx/
+
+## Loading the clusters into a Graph Database
+To load the first file with cluster ids
+```
+USING PERIODIC COMMIT 500
+LOAD CSV FROM 'file:///overview_communities_1.csv' AS line
+CREATE (com:Community { id: toInteger(line[0])})
+```
+To load the other files with cluster ids
+```
+USING PERIODIC COMMIT 500
+LOAD CSV FROM 'file:///overview_communities_3.csv' AS line
+MERGE (com:Community { id: toInteger(line[0])})
+```
+
+```
+CREATE CONSTRAINT ON (com:Community) ASSERT com.id IS UNIQUE
+```
+To load the links between pages and a cluster of the first file
+```
+USING PERIODIC COMMIT 500
+LOAD CSV FROM 'file:///output_communities_1.csv' AS line
+MATCH (page1:Page{id: toInteger(line[0])}),
+(com:Community{id: toInteger(line[1])})
+CREATE (page1)-[:PART_OF_COM]->(com)
+```
+To load the links between pages and a cluster of the other files
+```
+USING PERIODIC COMMIT 500
+LOAD CSV FROM 'file:///output_communities_3.csv' AS line
+MATCH (page1:Page{id: toInteger(line[0])}),
+(com:Community{id: toInteger(line[1])})
+MERGE (page1)-[:PART_OF_COM]->(com)
+```
+## Exclude communities of nodes from shortest path
+```
+MATCH (begin:Page{title: 'Katholieke_Universiteit_Leuven'}), (end:Page{title: 'Adolf_Hitler'}), p = shortestPath((begin)-[:REFERENCES_TO*]->(end)),(com:Community{id:10}),(com2:Community{id: 159}),(com3:Community{id: 1323})
+WHERE NONE(n IN  FILTER(n IN nodes(p) WHERE NOT (n = begin OR n = end)) WHERE (EXISTS((n)-[:PART_OF_COM]->(com)) OR EXISTS((n)-[:PART_OF_COM]->(com2)) OR EXISTS((n)-[:PART_OF_COM]->(com3))))
+RETURN p
+```
+Find community of page
+```
+MATCH (page:Page{title: 'Tweede_Wereldoorlog'})-[:PART_OF_COM]->(c)
+RETURN c
+```
+
