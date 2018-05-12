@@ -68,7 +68,8 @@ public class WikiPathFinder implements AutoCloseable {
         if (blockedCommunities.isEmpty()) {
             return findShortestPathSimple(from, to);
         } else {
-            return findShortestPathExcludingClusters(from, to, blockedCommunities);
+            System.out.println("Calculating with blocked communities");
+            return findShortestPathExcludingCommunities(from, to, blockedCommunities);
         }
     }
 
@@ -91,7 +92,7 @@ public class WikiPathFinder implements AutoCloseable {
     /**
      * Finds shortest path though the graph but blocks nodes belonging to given communities
      */
-    private Collection<WikiPath> findShortestPathExcludingClusters(
+    private Collection<WikiPath> findShortestPathExcludingCommunities(
             String from, final String to, Collection<WikiCommunityToken> blockedCommunities) {
         List<WikiCommunityToken> tokens = new ArrayList<>(blockedCommunities);
         String query = createShortestPathQueryForCommunities(tokens);

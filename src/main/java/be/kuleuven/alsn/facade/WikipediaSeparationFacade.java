@@ -23,9 +23,8 @@ public class WikipediaSeparationFacade implements IWikipediaSeparationFacade {
     private Neo4jConnectionDetails neo4jConnectionDetails;
 
     @Override
-    public Collection<WikiPath> calculateShortestPath(String from, String to,
-                                                      Collection<WikiCommunityToken> blockedCommunities) {
-        return linksFinder.findShortestPath(from, to, blockedCommunities);
+    public Collection<WikiPath> calculateShortestPath(String from, String to) {
+        return linksFinder.findShortestPath(from, to, communityFilter.getBlockedCommunities());
     }
 
     @Override

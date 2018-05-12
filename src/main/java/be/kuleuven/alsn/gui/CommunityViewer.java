@@ -5,8 +5,6 @@ import be.kuleuven.alsn.data.WikiPageWithLinksCount;
 import be.kuleuven.alsn.facade.IWikipediaCommunityFacade;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
 public class CommunityViewer {
@@ -32,24 +30,15 @@ public class CommunityViewer {
 
         // Initialise list with page nodes
         List<WikiPageWithLinksCount> communityPages = communityFacade.getCommunityPages(community);
+        System.out.println("pages:" +communityPages);
         DefaultListModel<WikiPageWithLinksCount> lstNodesModel = new DefaultListModel<>();
         communityPages.forEach(lstNodesModel::addElement);
         lstNodes.setModel(lstNodesModel);
 
         // Initialise block buttons
         updateBlockedButtonEnabledness();
-        blockCommunityButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                communityFacade.blockCommunity(community);
-            }
-        });
-        unblockCommunityButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                communityFacade.unblockCommunity(community);
-            }
-        });
+        blockCommunityButton.addActionListener(x -> communityFacade.blockCommunity(community));
+        unblockCommunityButton.addActionListener(x -> communityFacade.unblockCommunity(community));
         communityFacade.addBlockListener(x->updateBlockedButtonEnabledness());
         communityFacade.addUnblockListener(x->updateBlockedButtonEnabledness());
     }

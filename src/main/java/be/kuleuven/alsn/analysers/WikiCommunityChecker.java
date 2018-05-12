@@ -10,6 +10,7 @@ import org.neo4j.driver.v1.StatementResult;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.neo4j.driver.v1.Values.parameters;
 
@@ -41,7 +42,7 @@ public class WikiCommunityChecker implements AutoCloseable {
                         .writeTransaction(tx ->
                                 tx.run(GET_CLUSTER_OF_PAGE, parameters("id", page.getPageId())));
         if (statementResult.hasNext()) {
-            return new WikiCommunityToken((Long)statementResult.single().get(0).asNode().asMap().get("id"));
+            return new WikiCommunityToken((Long) statementResult.single().get(0).asNode().asMap().get("id"));
         } else {
             throw new IllegalArgumentException("No page with page id " + page.getPageId() + " exists.");
         }
@@ -55,16 +56,14 @@ public class WikiCommunityChecker implements AutoCloseable {
         List<WikiPageWithLinksCount> result = new ArrayList<>();
         while (statementResult.hasNext()) {
             Record record = statementResult.next();
-            /* TODO
-            WikipageCard card = record.get(0).asNode();
-            WikiPageWithLinksCount wikiPageWithLinksCount = new WikiPageWithLinksCount()
-            record.get(0).
-            */
+            Map<String, Object> nodeMap = record.get(0).asNode().asMap();
+            WikiPageCard pageCard = new WikiPageCard((Long) nodeMap.get("id"), (String) nodeMap.get("title"));
+            int number = record.get(1).asInt();
+            WikiPageWithLinksCount wikiPageWithLinksCount = new WikiPageWithLinksCount(pageCard, number);
+            result.add(wikiPageWithLinksCount);
         }
         return result;
     }
-
-
 
 
 }

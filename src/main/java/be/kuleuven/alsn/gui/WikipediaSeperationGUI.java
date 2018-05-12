@@ -72,7 +72,7 @@ public class WikipediaSeperationGUI {
         btnCalculateShortestPath.setEnabled(false);
         new Thread(() -> {
             if (checkValidnessWithDialog(from) && checkValidnessWithDialog(to)) {
-                Collection<WikiPath> paths = facade.calculateShortestPath(from, to, facade.getBlockedCommunities());
+                Collection<WikiPath> paths = facade.calculateShortestPath(from, to);
 
                 if (paths.isEmpty()) {
                     JOptionPane.showMessageDialog(mainPanel,

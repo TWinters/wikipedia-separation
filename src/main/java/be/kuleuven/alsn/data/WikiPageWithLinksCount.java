@@ -16,4 +16,9 @@ public class WikiPageWithLinksCount {
     public int getIncomingLinks() {
         return incomingLinks;
     }
+
+    @Override
+    public String toString() {
+        return card.toString() + " (" + incomingLinks+ ")";
+    }
 }
