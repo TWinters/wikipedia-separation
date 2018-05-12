@@ -195,6 +195,7 @@ Then the following commands can be executed in Neo4j:
 ```
 USING PERIODIC COMMIT 500
 LOAD CSV FROM 'file:///overview_communities.csv' AS line
+FIELDTERMINATOR '\t'
 CREATE (com:Community { id: toInteger(line[0])})
 ```
 
@@ -205,6 +206,7 @@ CREATE CONSTRAINT ON (com:Community) ASSERT com.id IS UNIQUE
 ```
 USING PERIODIC COMMIT 500
 LOAD CSV FROM 'file:///output_communities.csv' AS line
+FIELDTERMINATOR '\t'
 MATCH (page1:Page{id: toInteger(line[0])}),
 (com:Community{id: toInteger(line[1])})
 CREATE (page1)-[:PART_OF_COM]->(com)
