@@ -103,18 +103,18 @@ public class WikiPathFinder implements AutoCloseable {
 
     private String createShortestPathQueryForCommunities(List<WikiCommunityToken> blockedCommunities) {
         String query = "MATCH (begin:Page{title: $from})," +
-                "(end:Page{title: $to})," +
-                "p = shortestPath((begin)-[:REFERENCES_TO*]->(end))," +
+                " (end:Page{title: $to})," +
+                " p = shortestPath((begin)-[:REFERENCES_TO*]->(end))," +
                 IntStream.range(0, blockedCommunities.size())
-                        .mapToObj(i -> "(com" + i + ":Community{id:" + blockedCommunities.get(i) + "})")
+                        .mapToObj(i -> "(com" + i + ":Community{id:" + blockedCommunities.get(i).getId() + "})")
                         .collect(Collectors.joining(",")) + " " +
-                "WHERE NONE (n IN FILTER (n IN nodes (p) WHERE NOT(n = begin OR n = end)) " +
-                "WHERE(" +
+                " WHERE NONE (n IN FILTER (n IN nodes (p) WHERE NOT(n = begin OR n = end)) " +
+                " WHERE (" +
                 IntStream.range(0, blockedCommunities.size())
                         .mapToObj(i -> "EXISTS ((n) -[:PART_OF_COM]->(com" + i + "))")
                         .collect(Collectors.joining(" OR "))
                 +
-                "RETURN p ";
+                ")) RETURN p ";
         return query;
     }
 
