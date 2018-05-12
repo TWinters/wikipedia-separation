@@ -2,13 +2,12 @@ package be.kuleuven.alsn.facade;
 
 import be.kuleuven.alsn.analysers.*;
 import be.kuleuven.alsn.arguments.Neo4jConnectionDetails;
+import be.kuleuven.alsn.data.WikiCommunity;
 import be.kuleuven.alsn.data.WikiCommunityToken;
 import be.kuleuven.alsn.data.WikiPageCard;
-import be.kuleuven.alsn.data.WikiPageWithLinksCount;
 import be.kuleuven.alsn.data.WikiPath;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -50,7 +49,7 @@ public class WikipediaSeparationFacade implements IWikipediaSeparationFacade {
     }
 
     @Override
-    public List<WikiPageWithLinksCount> getCommunityPages(WikiCommunityToken communityId) {
+    public WikiCommunity getCommunityPages(WikiCommunityToken communityId) {
         return communityChecker.getCommunityPages(communityId);
     }
 

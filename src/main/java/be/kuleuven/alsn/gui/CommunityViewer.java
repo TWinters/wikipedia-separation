@@ -1,11 +1,11 @@
 package be.kuleuven.alsn.gui;
 
+import be.kuleuven.alsn.data.WikiCommunity;
 import be.kuleuven.alsn.data.WikiCommunityToken;
 import be.kuleuven.alsn.data.WikiPageWithLinksCount;
 import be.kuleuven.alsn.facade.IWikipediaCommunityFacade;
 
 import javax.swing.*;
-import java.util.List;
 
 public class CommunityViewer {
     private JFrame frame;
@@ -29,9 +29,9 @@ public class CommunityViewer {
         lblCommunityId.setText(Long.toString(community.getId()));
 
         // Initialise list with page nodes
-        List<WikiPageWithLinksCount> communityPages = communityFacade.getCommunityPages(community);
+        WikiCommunity communityPages = communityFacade.getCommunityPages(community);
         DefaultListModel<WikiPageWithLinksCount> lstNodesModel = new DefaultListModel<>();
-        communityPages.forEach(lstNodesModel::addElement);
+        communityPages.getPageCards().forEach(lstNodesModel::addElement);
         lstNodes.setModel(lstNodesModel);
 
         // Initialise block buttons

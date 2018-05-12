@@ -1,6 +1,7 @@
 package be.kuleuven.alsn.analysers;
 
 import be.kuleuven.alsn.arguments.Neo4jConnectionDetails;
+import be.kuleuven.alsn.data.WikiCommunity;
 import be.kuleuven.alsn.data.WikiCommunityToken;
 import be.kuleuven.alsn.data.WikiPageCard;
 import be.kuleuven.alsn.data.WikiPageWithLinksCount;
@@ -50,7 +51,7 @@ public class WikiCommunityChecker implements AutoCloseable, IWikiCommunityChecke
     }
 
     @Override
-    public List<WikiPageWithLinksCount> getCommunityPages(WikiCommunityToken communityId) {
+    public WikiCommunity getCommunityPages(WikiCommunityToken communityId) {
         StatementResult statementResult =
                 driver.session()
                         .writeTransaction(tx ->
@@ -64,7 +65,7 @@ public class WikiCommunityChecker implements AutoCloseable, IWikiCommunityChecke
             WikiPageWithLinksCount wikiPageWithLinksCount = new WikiPageWithLinksCount(pageCard, number);
             result.add(wikiPageWithLinksCount);
         }
-        return result;
+        return new WikiCommunity(communityId,result);
     }
 
 
