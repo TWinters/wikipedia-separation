@@ -39,13 +39,15 @@ public class WikiCommunity {
         return Objects.hash(token, pageCards);
     }
 
+
+    private static final int displayAmount = 5;
     @Override
     public String toString() {
-        return pageCards.subList(0, Math.max(0,Math.min(3,pageCards.size())))
+        return pageCards.subList(0, Math.max(0,Math.min(displayAmount,pageCards.size())))
                 .stream()
                 .map(WikiPageWithLinksCount::getCard)
                 .map(WikiPageCard::getPageName)
-                .collect(Collectors.joining(", "))
+                .collect(Collectors.joining(" | "))
                 + (pageCards.size()>3 ? "..." : "");
     }
 }

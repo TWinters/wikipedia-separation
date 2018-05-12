@@ -2,7 +2,7 @@ package be.kuleuven.alsn.gui;
 
 import be.kuleuven.alsn.arguments.LinksFinderArguments;
 import be.kuleuven.alsn.arguments.Neo4jConnectionDetails;
-import be.kuleuven.alsn.data.WikiCommunityToken;
+import be.kuleuven.alsn.data.WikiCommunity;
 import be.kuleuven.alsn.data.WikiPath;
 import be.kuleuven.alsn.facade.IWikipediaSeparationFacade;
 import be.kuleuven.alsn.facade.WikipediaSeparationFacade;
@@ -15,7 +15,7 @@ import java.util.Collection;
 public class WikipediaSeperationGUI {
     private JTextField txtFrom;
     private JTextField txtTo;
-    private JList<WikiCommunityToken> lstClusterBlacklist;
+    private JList<WikiCommunity> lstClusterBlacklist;
     private JButton btnToWhiteList;
     private JButton btnCalculateShortestPath;
     private JPanel mainPanel;
@@ -36,7 +36,7 @@ public class WikipediaSeperationGUI {
         facade.getNeo4JConnectDetails().ifPresent(this::setNeo4jConnection);
 
         // Linking buttons
-        btnCalculateShortestPath.addActionListener(x -> calculateShortestPath());
+        btnCalculateShortestPath.addActionListener(x -> calculateShortestPathLocal());
         updateConnectionButton.addActionListener(x -> updateNeo4jConnection(true));
 
         btnToWhiteList.addActionListener(x -> addSelectionToWhitelist());
@@ -58,38 +58,40 @@ public class WikipediaSeperationGUI {
 
 
     private void updateBlockedCommunities() {
-        DefaultListModel<WikiCommunityToken> defaultListModel = new DefaultListModel<>();
-        facade.getBlockedCommunities().forEach(defaultListModel::addElement);
+        DefaultListModel<WikiCommunity> defaultListModel = new DefaultListModel<>();
+        facade.getBlockedCommunities().stream().map(facade::getCommunityPages).forEach(defaultListModel::addElement);
         lstClusterBlacklist.setModel(defaultListModel);
     }
 
 
     //region Calculating shortest path
+    private void calculateShortestPathLocal() {
+        btnCalculateShortestPath.setEnabled(false);
+        SwingUtilities.invokeLater(this::calculateShortestPath);
+    }
+
     private void calculateShortestPath() {
         String from = txtFrom.getText();
         String to = txtTo.getText();
 
-        btnCalculateShortestPath.setEnabled(false);
-        new Thread(() -> {
-            if (checkValidnessWithDialog(from) && checkValidnessWithDialog(to)) {
-                Collection<WikiPath> paths = facade.calculateShortestPath(from, to);
+        if (checkValidnessWithDialog(from) && checkValidnessWithDialog(to)) {
+            Collection<WikiPath> paths = facade.calculateShortestPath(from, to);
 
-                if (paths.isEmpty()) {
-                    JOptionPane.showMessageDialog(mainPanel,
-                            "There is no path found between '" + from + "' and '" + to + "'.",
-                            "No paths found",
-                            JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    // Open a window for each path
-                    paths.stream()
-                            .map(path-> new WikipediaPathViewer(facade, path, this::calculateShortestPath))
-                            .forEach(WikipediaPathViewer::run);
-                }
+            if (paths.isEmpty()) {
+                JOptionPane.showMessageDialog(mainPanel,
+                        "There is no path found between '" + from + "' and '" + to + "'.",
+                        "No paths found",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                // Open a window for each path
+                paths.stream()
+                        .map(path-> new WikipediaPathViewer(facade, path, this::calculateShortestPath))
+                        .forEach(WikipediaPathViewer::run);
             }
-            btnCalculateShortestPath.setEnabled(true);
-        }).start();
+        }
+        btnCalculateShortestPath.setEnabled(true);
     }
-    //end region
+        //end region
 
     private boolean checkValidnessWithDialog(String page) {
         if (!facade.isValidPage(page)) {
@@ -104,11 +106,11 @@ public class WikipediaSeperationGUI {
 
     //region Cluster filtering
     private void addSelectionToWhitelist() {
-        lstClusterBlacklist.getSelectedValuesList().forEach(facade::unblockCommunity);
+        lstClusterBlacklist.getSelectedValuesList().stream().map(WikiCommunity::getToken).forEach(facade::unblockCommunity);
     }
 
     private void openSelectedCommunities() {
-        lstClusterBlacklist.getSelectedValuesList().forEach(community->new CommunityViewer(facade, community));
+        lstClusterBlacklist.getSelectedValuesList().stream().map(WikiCommunity::getToken).forEach(community->new CommunityViewer(facade, community));
     }
 
 

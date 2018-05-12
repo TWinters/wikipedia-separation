@@ -7,6 +7,7 @@ import be.kuleuven.alsn.facade.IWikipediaCommunityFacade;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
+import java.util.Optional;
 
 public class WikipediaPathViewer {
     private final IWikipediaCommunityFacade communityFacade;
@@ -16,6 +17,7 @@ public class WikipediaPathViewer {
     private JButton viewCommunitiesButton;
     private JButton blockPageCommunityButton;
     private JButton recalculateButton;
+    private JButton unblockPageCommunityButton;
 
     public WikipediaPathViewer(IWikipediaCommunityFacade communityFacade, WikiPath path, Runnable recalculatePath) {
         this.communityFacade = communityFacade;
@@ -40,10 +42,37 @@ public class WikipediaPathViewer {
                 recalculateButton.setEnabled(true);
             });
         });
-        blockPageCommunityButton.addActionListener(x -> toggleBlockStatus());
+        blockPageCommunityButton.addActionListener(x -> this.block());
+        unblockPageCommunityButton.addActionListener(x -> this.unblock());
         communityFacade.addBlockListener(x -> updateSelected());
         communityFacade.addUnblockListener(x -> updateSelected());
         lstPath.addListSelectionListener(this::updateSelected);
+    }
+
+    private Optional<WikiCommunityToken> getCommunityToken() {
+        if (lstPath.isSelectionEmpty()) {
+            return Optional.empty();
+        }
+        WikiPageCard page = lstPath.getSelectedValue();
+        WikiCommunityToken community = communityFacade.getCommunityOf(page);
+        return Optional.of(community);
+
+    }
+
+    private void unblock() {
+        unblockPageCommunityButton.setEnabled(false);
+        SwingUtilities.invokeLater(() -> {
+            Optional<WikiCommunityToken> token = getCommunityToken();
+            token.ifPresent(communityFacade::unblockCommunity);
+        });
+    }
+
+    private void block() {
+        blockPageCommunityButton.setEnabled(false);
+        SwingUtilities.invokeLater(() -> {
+            Optional<WikiCommunityToken> token = getCommunityToken();
+            token.ifPresent(communityFacade::blockCommunity);
+        });
     }
 
     private void viewCommunitySelectedNode() {
@@ -53,24 +82,11 @@ public class WikipediaPathViewer {
         });
     }
 
-    private void toggleBlockStatus() {
-        WikiPageCard page = lstPath.getSelectedValue();
-        WikiCommunityToken community = communityFacade.getCommunityOf(page);
-        if (communityFacade.isBlocked(community)) {
-            communityFacade.unblockCommunity(community);
-        } else {
-            communityFacade.blockCommunity(community);
-        }
-
-    }
 
     private void updateSelected() {
-        blockPageCommunityButton.setEnabled(!lstPath.isSelectionEmpty());
-        if (communityFacade.isBlocked(communityFacade.getCommunityOf(lstPath.getSelectedValue()))) {
-            blockPageCommunityButton.setText("Unblock Page Community");
-        } else {
-            blockPageCommunityButton.setText("Block Page Community");
-        }
+        boolean isBlocked = communityFacade.isBlocked(communityFacade.getCommunityOf(lstPath.getSelectedValue()));
+        blockPageCommunityButton.setEnabled(!lstPath.isSelectionEmpty() && !isBlocked);
+        unblockPageCommunityButton.setEnabled(!lstPath.isSelectionEmpty() && isBlocked);
     }
 
     private void updateSelected(ListSelectionEvent listSelectionEvent) {

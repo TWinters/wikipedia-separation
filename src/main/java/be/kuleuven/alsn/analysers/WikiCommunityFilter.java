@@ -12,12 +12,12 @@ public class WikiCommunityFilter {
 
     public void block(WikiCommunityToken community) {
         blockedCommunities.add(community);
-        blockListeners.forEach(e->e.accept(community));
+        blockListeners.parallelStream().forEach(e->e.accept(community));
     }
 
     public void unblock(WikiCommunityToken community) {
         blockedCommunities.remove(community);
-        unblockListeners.forEach(e->e.accept(community));
+        unblockListeners.parallelStream().forEach(e->e.accept(community));
     }
 
     public Collection<WikiCommunityToken> getBlockedCommunities() {
