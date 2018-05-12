@@ -30,7 +30,6 @@ public class CommunityViewer {
 
         // Initialise list with page nodes
         List<WikiPageWithLinksCount> communityPages = communityFacade.getCommunityPages(community);
-        System.out.println("pages:" +communityPages);
         DefaultListModel<WikiPageWithLinksCount> lstNodesModel = new DefaultListModel<>();
         communityPages.forEach(lstNodesModel::addElement);
         lstNodes.setModel(lstNodesModel);

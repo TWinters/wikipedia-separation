@@ -29,7 +29,7 @@ public class WikiPathFinder implements AutoCloseable {
 
     private static final String shortestPathQuery = "MATCH (begin:Page { title: $from }),(end:Page { title: $to }), p = shortestPath((begin)-[:REFERENCES_TO*]->(end)) RETURN p";
     // TODO: Optimaliseerbaar door gebruik van volgende query: 'MATCH (s) WHERE ID(s) in [19, 3309035] RETURN ID(s),s.title' voor meerdere nodes
-    private static final String nodeNameQuery = "MATCH (s) WHERE ID(s) = $id RETURN s.title";
+    private static final String nodeNameQuery = "MATCH (s) WHERE ID(s) = $id RETURN s.id,s.title";
     private final Driver driver;
 
     private WikiPathFinder(Driver driver) {
@@ -68,7 +68,6 @@ public class WikiPathFinder implements AutoCloseable {
         if (blockedCommunities.isEmpty()) {
             return findShortestPathSimple(from, to);
         } else {
-            System.out.println("Calculating with blocked communities");
             return findShortestPathExcludingCommunities(from, to, blockedCommunities);
         }
     }
@@ -155,9 +154,10 @@ public class WikiPathFinder implements AutoCloseable {
     }
 
     private WikiPageCard toWikipediaPageCard(final long nodeId) {
-        return new WikiPageCard(nodeId, driver.session()
+        Record record = driver.session()
                 .writeTransaction(tx ->
                         tx.run(nodeNameQuery, parameters("id", nodeId)))
-                .single().get(0).asString());
+                .single();
+        return new WikiPageCard(record.get(0).asLong(), record.get(1).asString());
     }
 }

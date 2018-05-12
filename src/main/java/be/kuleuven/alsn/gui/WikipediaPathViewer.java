@@ -6,6 +6,7 @@ import be.kuleuven.alsn.data.WikiPath;
 import be.kuleuven.alsn.facade.IWikipediaCommunityFacade;
 
 import javax.swing.*;
+import java.util.stream.Collectors;
 
 public class WikipediaPathViewer {
     private final IWikipediaCommunityFacade communityFacade;
@@ -34,6 +35,10 @@ public class WikipediaPathViewer {
 
     private void viewCommunitiesSelectedNode() {
         WikiPageCard page = lstPath.getSelectedValue();
+        System.out.println(path.getPages().stream().map(WikiPageCard::getPageId)
+                .map(e->e+"")
+                .collect(Collectors.joining(",")));
+        System.out.println("Viewing community of " + page + ":" +page.getPageId());
         WikiCommunityToken community = communityFacade.getCommunityOf(page);
         new CommunityViewer(communityFacade, community);
     }
