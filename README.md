@@ -184,7 +184,7 @@ http://sotera.github.io/distributed-graph-analytics/
 
 http://sotera.github.io/distributed-graph-analytics/louvain/example/graphx/
 
-#### Loading the clusters into a Graph Database
+## Loading the clusters into a Graph Database
 To load the first file with cluster ids
 ```
 USING PERIODIC COMMIT 500
@@ -217,10 +217,15 @@ MATCH (page1:Page{id: toInteger(line[0])}),
 (com:Community{id: toInteger(line[1])})
 MERGE (page1)-[:PART_OF_COM]->(com)
 ```
-#### Exclude communities of nodes from shortest path
+## Exclude communities of nodes from shortest path
 ```
 MATCH (begin:Page{title: 'Katholieke_Universiteit_Leuven'}), (end:Page{title: 'Adolf_Hitler'}), p = shortestPath((begin)-[:REFERENCES_TO*]->(end)),(com:Community{id:10}),(com2:Community{id: 159}),(com3:Community{id: 1323})
 WHERE NONE(n IN  FILTER(n IN nodes(p) WHERE NOT (n = begin OR n = end)) WHERE (EXISTS((n)-[:PART_OF_COM]->(com)) OR EXISTS((n)-[:PART_OF_COM]->(com2)) OR EXISTS((n)-[:PART_OF_COM]->(com3))))
 RETURN p
+```
+Find community of page
+```
+MATCH (page:Page{title: 'Tweede_Wereldoorlog'})-[:PART_OF_COM]->(c)
+RETURN c
 ```
 
