@@ -46,7 +46,7 @@ public class WikipediaSeparationFacade implements IWikipediaSeparationFacade {
     }
 
     @Override
-    public List<WikiPageWithLinksCount> getCommunityPages(long communityId) {
+    public List<WikiPageWithLinksCount> getCommunityPages(WikiCommunityToken communityId) {
         return communityChecker.getCommunityPages(communityId);
     }
 
@@ -63,6 +63,11 @@ public class WikipediaSeparationFacade implements IWikipediaSeparationFacade {
     @Override
     public void unblockCommunity(WikiCommunityToken token) {
         communityFilter.unblock(token);
+    }
+
+    @Override
+    public boolean isBlocked(WikiCommunityToken community) {
+        return communityFilter.isBlocked(community);
     }
     //endregion
 }

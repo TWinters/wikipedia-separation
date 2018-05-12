@@ -7,11 +7,13 @@ import java.util.Collection;
 import java.util.List;
 
 public interface IWikipediaCommunityFacade {
-    List<WikiPageWithLinksCount> getCommunityPages(long communityId);
+    List<WikiPageWithLinksCount> getCommunityPages(WikiCommunityToken communityId);
 
     Collection<WikiCommunityToken> getBlockedCommunities();
 
     void blockCommunity(WikiCommunityToken token);
 
     void unblockCommunity(WikiCommunityToken token);
+
+    boolean isBlocked(WikiCommunityToken community);
 }

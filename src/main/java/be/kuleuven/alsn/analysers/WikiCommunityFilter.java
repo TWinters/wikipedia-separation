@@ -20,4 +20,8 @@ public class WikiCommunityFilter {
     public Collection<WikiCommunityToken> getBlockedCommunities() {
         return blockedCommunities;
     }
+
+    public boolean isBlocked(WikiCommunityToken community) {
+        return blockedCommunities.contains(community);
+    }
 }

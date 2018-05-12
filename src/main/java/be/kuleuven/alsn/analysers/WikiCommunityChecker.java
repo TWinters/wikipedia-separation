@@ -46,11 +46,11 @@ public class WikiCommunityChecker implements AutoCloseable {
         }
     }
 
-    public List<WikiPageWithLinksCount> getCommunityPages(long communityId) {
+    public List<WikiPageWithLinksCount> getCommunityPages(WikiCommunityToken communityId) {
         StatementResult statementResult =
                 driver.session()
                         .writeTransaction(tx ->
-                                tx.run(GET_PAGES_OF_CLUSTER, parameters("id", communityId)));
+                                tx.run(GET_PAGES_OF_CLUSTER, parameters("id", communityId.getId())));
         List<WikiPageWithLinksCount> result = new ArrayList<>();
         while (statementResult.hasNext()) {
             Record record = statementResult.next();
