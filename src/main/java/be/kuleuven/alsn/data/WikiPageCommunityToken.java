@@ -1,9 +1,9 @@
 package be.kuleuven.alsn.data;
 
 public class WikiPageCommunityToken {
-    private final int id;
+    private final long id;
 
-    public WikiPageCommunityToken(int id) {
+    public WikiPageCommunityToken(long id) {
         this.id = id;
     }
 
