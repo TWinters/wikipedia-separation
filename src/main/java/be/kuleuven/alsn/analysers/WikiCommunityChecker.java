@@ -1,8 +1,8 @@
 package be.kuleuven.alsn.analysers;
 
 import be.kuleuven.alsn.arguments.Neo4jConnectionDetails;
+import be.kuleuven.alsn.data.WikiCommunityToken;
 import be.kuleuven.alsn.data.WikiPageCard;
-import be.kuleuven.alsn.data.WikiPageCommunityToken;
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.StatementResult;
@@ -34,13 +34,13 @@ public class WikiCommunityChecker implements AutoCloseable {
         driver.close();
     }
 
-    public WikiPageCommunityToken getCommunityOf(long pageId) {
+    public WikiCommunityToken getCommunityOf(long pageId) {
         StatementResult statementResult =
                 driver.session()
                         .writeTransaction(tx ->
                                 tx.run(GET_CLUSTER_OF_PAGE, parameters("id", pageId)));
         if (statementResult.hasNext()) {
-            return new WikiPageCommunityToken(statementResult.single().get(0).asLong());
+            return new WikiCommunityToken(statementResult.single().get(0).asLong());
         } else {
             throw new IllegalArgumentException("No page with page id " + pageId + " exists.");
         }

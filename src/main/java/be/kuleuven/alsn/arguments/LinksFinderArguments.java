@@ -1,6 +1,6 @@
 package be.kuleuven.alsn.arguments;
 
-import be.kuleuven.alsn.data.WikiPageCommunityToken;
+import be.kuleuven.alsn.data.WikiCommunityToken;
 import com.beust.jcommander.Parameter;
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ public class LinksFinderArguments {
     private String to = "Adolf_Hitler";
 
     @Parameter(names = "-blocked", description = "Communities of which nodes are not allowed to appear on the path")
-    private Collection<WikiPageCommunityToken> blockedCommunities = new ArrayList<>();
+    private Collection<WikiCommunityToken> blockedCommunities = new ArrayList<>();
 
 
     public String getFrom() {
@@ -30,7 +30,7 @@ public class LinksFinderArguments {
         return to;
     }
 
-    public Collection<WikiPageCommunityToken> getBlockedCommunities() {
+    public Collection<WikiCommunityToken> getBlockedCommunities() {
         return blockedCommunities;
     }
 }

@@ -2,7 +2,7 @@ package be.kuleuven.alsn.gui;
 
 import be.kuleuven.alsn.arguments.LinksFinderArguments;
 import be.kuleuven.alsn.arguments.Neo4jConnectionDetails;
-import be.kuleuven.alsn.data.WikiPageCommunityToken;
+import be.kuleuven.alsn.data.WikiCommunityToken;
 import be.kuleuven.alsn.data.WikiPath;
 import be.kuleuven.alsn.facade.IWikipediaSeparationFacade;
 import be.kuleuven.alsn.facade.WikipediaSeparationFacade;
@@ -61,7 +61,7 @@ public class WikipediaSeperationGUI {
         btnCalculateShortestPath.setEnabled(false);
         new Thread(() -> {
             if (checkValidnessWithDialog(from) && checkValidnessWithDialog(to)) {
-                List<WikiPageCommunityToken> blockedCommunities = new ArrayList<>(); //TODO
+                List<WikiCommunityToken> blockedCommunities = new ArrayList<>(); //TODO
                 Collection<WikiPath> paths = facade.calculateShortestPath(from, to, blockedCommunities);
 
                 if (paths.isEmpty()) {

@@ -2,8 +2,8 @@ package be.kuleuven.alsn.analysers;
 
 import be.kuleuven.alsn.arguments.LinksFinderArguments;
 import be.kuleuven.alsn.arguments.Neo4jConnectionDetails;
+import be.kuleuven.alsn.data.WikiCommunityToken;
 import be.kuleuven.alsn.data.WikiPageCard;
-import be.kuleuven.alsn.data.WikiPageCommunityToken;
 import be.kuleuven.alsn.data.WikiPath;
 import com.beust.jcommander.JCommander;
 import com.google.common.collect.ImmutableMap;
@@ -64,7 +64,7 @@ public class WikiPathFinder implements AutoCloseable {
     }
 
     public Collection<WikiPath> findShortestPath(
-            final String from, final String to, Collection<WikiPageCommunityToken> blockedCommunities) {
+            final String from, final String to, Collection<WikiCommunityToken> blockedCommunities) {
         if (blockedCommunities.isEmpty()) {
             return findShortestPathSimple(from, to);
         } else {
@@ -92,8 +92,8 @@ public class WikiPathFinder implements AutoCloseable {
      * Finds shortest path though the graph but blocks nodes belonging to given communities
      */
     private Collection<WikiPath> findShortestPathExcludingClusters(
-            String from, final String to, Collection<WikiPageCommunityToken> blockedCommunities) {
-        List<WikiPageCommunityToken> tokens = new ArrayList<>(blockedCommunities);
+            String from, final String to, Collection<WikiCommunityToken> blockedCommunities) {
+        List<WikiCommunityToken> tokens = new ArrayList<>(blockedCommunities);
         String query = createShortestPathQueryForCommunities(tokens);
         Value parameters = createParametersForCommunities(from, to, tokens);
         return runPathFindingQuery(query, parameters);
@@ -101,7 +101,7 @@ public class WikiPathFinder implements AutoCloseable {
 
     }
 
-    private String createShortestPathQueryForCommunities(List<WikiPageCommunityToken> blockedCommunities) {
+    private String createShortestPathQueryForCommunities(List<WikiCommunityToken> blockedCommunities) {
         String query = "MATCH (begin:Page{title: $from})," +
                 "(end:Page{title: $to})," +
                 "p = shortestPath((begin)-[:REFERENCES_TO*]->(end))," +
@@ -119,7 +119,7 @@ public class WikiPathFinder implements AutoCloseable {
     }
 
     private Value createParametersForCommunities(String from, String to,
-                                                 List<WikiPageCommunityToken> blockedCommunities) {
+                                                 List<WikiCommunityToken> blockedCommunities) {
         ImmutableMap.Builder<String, Object> b = ImmutableMap.builder();
 
         b.put("from", from);
