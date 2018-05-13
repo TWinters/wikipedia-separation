@@ -19,19 +19,25 @@ import java.util.stream.Stream;
 
 public class MonteCarloAveragePathLengthExperiment {
 
-    private final List<WikiCommunityToken> largestCommunities = Stream.of(10, 9, 13, 11, 208, 37283, 645, 159, 28, 143,
+    public static final List<WikiCommunityToken> LARGEST_COMMUNITIES = Stream.of(10, 9, 13, 11, 208, 37283, 645, 159, 28, 143,
             21686, 124, 66, 1386, 9163, 156, 350, 76958, 236, 173,
             204405, 15268, 260616, 270317, 133270, 383405, 4972, 335465, 259532, 260877)
+            .map(WikiCommunityToken::new)
+            .collect(Collectors.toList());
+    public static final List<WikiCommunityToken> COMMUNITIES_OF_LARGEST_MEMBERS = Stream.of(7596, 236, 236, 6093, 6093, 6093,
+            29, 86092, 7596, 308, 208, 308, 133270, 143, 6093, 11, 236, 236, 208, 308)
             .map(WikiCommunityToken::new)
             .collect(Collectors.toList());
 
 
     private final int sampleSize = 100;
+    private final List<WikiCommunityToken> communities;
 
     private final IWikipediaSeparationFacade facade;
 
-    public MonteCarloAveragePathLengthExperiment(IWikipediaSeparationFacade facade) {
+    public MonteCarloAveragePathLengthExperiment(IWikipediaSeparationFacade facade, List<WikiCommunityToken> communities) {
         this.facade = facade;
+        this.communities = communities;
 
     }
 
@@ -49,21 +55,24 @@ public class MonteCarloAveragePathLengthExperiment {
         } catch (ServiceUnavailableException e) {
             System.out.println("WARNING: NO DATABASE CONNECTION ESTABLISHED: PLEASE START UP NEO4J!");
         }
-        MonteCarloAveragePathLengthExperiment experiment = new MonteCarloAveragePathLengthExperiment(facade);
+        MonteCarloAveragePathLengthExperiment experiment = new MonteCarloAveragePathLengthExperiment(facade,COMMUNITIES_OF_LARGEST_MEMBERS);
         experiment.run();
 
     }
 
     private void run() throws IOException {
         PrintWriter totalOutputFile = new PrintWriter(new FileWriter("experiments/block-total.csv"));
+        totalOutputFile.write("iteration\ttotal length\taverage length\tamount of no solution found\n");
+        totalOutputFile.flush();;
 
-        for (int i = 0; i <= largestCommunities.size(); i++) {
-            if (i>0) {
-                facade.blockCommunity(largestCommunities.get(i - 1));
+        for (int i = 0; i <= communities.size(); i++) {
+            if (i > 0) {
+                facade.blockCommunity(communities.get(i - 1));
             }
             PrintWriter outputFile = new PrintWriter(new FileWriter("experiments/block" + i + ".csv"));
 
             int totalLength = 0;
+            int noPathsFound = 0;
 
             for (int j = 0; j < sampleSize; j++) {
 
@@ -73,19 +82,25 @@ public class MonteCarloAveragePathLengthExperiment {
                 Collection<WikiPath> path = facade.calculateShortestPath(page1.getPageName(), page2.getPageName());
                 if (path.isEmpty()) {
                     j -= 1;
-                    continue;
+                    noPathsFound += 1;
                 } else {
                     int length = path.iterator().next().getPathLength();
                     totalLength += length;
                     String output = page1.getPageId() + "\t" + page2.getPageId() + "\t" + length + "\n";
 
                     outputFile.write(output);
+                    outputFile.flush();
                 }
             }
             outputFile.close();
 
-            String totalFileOutput = i + "\t" + totalLength + "\t" + ((double) totalLength / (double) sampleSize) + "\n";
+            String totalFileOutput =
+                    i + "\t" +
+                            totalLength + "\t" +
+                            ((double) totalLength / (double) sampleSize) +
+                            "\t" + noPathsFound + "\n";
             totalOutputFile.write(totalFileOutput);
+            totalOutputFile.flush();
 
         }
         totalOutputFile.close();
