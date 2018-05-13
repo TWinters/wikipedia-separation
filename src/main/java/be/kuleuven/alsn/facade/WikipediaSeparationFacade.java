@@ -17,6 +17,7 @@ public class WikipediaSeparationFacade implements IWikipediaSeparationFacade {
     private WikiCommunityFilter communityFilter = new WikiCommunityFilter();
     private WikiPageExistanceChecker existanceChecker;
     private Neo4jConnectionDetails neo4jConnectionDetails;
+    private WikiPageSampler pageSampler;
 
     @Override
     public Collection<WikiPath> calculateShortestPath(String from, String to) {
@@ -35,6 +36,7 @@ public class WikipediaSeparationFacade implements IWikipediaSeparationFacade {
         this.linksFinder = new WikiPathFinder(neo4jArguments);
         this.communityChecker = new CachedCommunityChecker(new WikiCommunityChecker(neo4jArguments));
         this.existanceChecker = new WikiPageExistanceChecker(neo4jArguments);
+        this.pageSampler = new WikiPageSampler(neo4jArguments);
     }
 
     @Override
@@ -82,5 +84,11 @@ public class WikipediaSeparationFacade implements IWikipediaSeparationFacade {
     public void addUnblockListener(Consumer<WikiCommunityToken> listener) {
         communityFilter.addUnblockListener(listener);
     }
+
+    @Override
+    public WikiPageCard getRandomPage() {
+        return pageSampler.getRandomPage();
+    }
+
     /* endregion */
 }

@@ -1,6 +1,7 @@
 package be.kuleuven.alsn.facade;
 
 import be.kuleuven.alsn.arguments.Neo4jConnectionDetails;
+import be.kuleuven.alsn.data.WikiPageCard;
 import be.kuleuven.alsn.data.WikiPath;
 
 import java.util.Collection;
@@ -21,4 +22,5 @@ public interface IWikipediaSeparationFacade extends IWikipediaCommunityFacade {
 
     boolean isValidPage(String page);
 
+    WikiPageCard getRandomPage();
 }

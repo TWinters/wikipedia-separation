@@ -95,7 +95,7 @@ public class WikipediaPathViewer {
 
     //region Running the GUI
     public void run() {
-        JFrame frame = new JFrame("Wikipedia Path GUI");
+        JFrame frame = new JFrame("Path Viewer");
         frame.setContentPane(this.mainPanel);
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frame.pack();
