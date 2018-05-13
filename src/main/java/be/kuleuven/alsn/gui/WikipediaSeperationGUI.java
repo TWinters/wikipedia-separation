@@ -8,6 +8,7 @@ import be.kuleuven.alsn.facade.IWikipediaSeparationFacade;
 import be.kuleuven.alsn.facade.WikipediaSeparationFacade;
 import com.beust.jcommander.JCommander;
 import org.neo4j.driver.v1.exceptions.AuthenticationException;
+import org.neo4j.driver.v1.exceptions.ServiceUnavailableException;
 
 import javax.swing.*;
 import java.util.Collection;
@@ -46,13 +47,29 @@ public class WikipediaSeperationGUI {
 
         initialiseFrame();
         viewCommunityButton.addActionListener(x->openSelectedCommunities());
+
+//        checkNeo4jConnection();
     }
+
 
 
     private void setDefaultLinkArguments(LinksFinderArguments linkArguments) {
         this.txtFrom.setText(linkArguments.getFrom());
         this.txtTo.setText(linkArguments.getTo());
     }
+
+
+//    private void checkNeo4jConnection() {
+//
+//        if (!facade.getNeo4JConnectDetails().isPresent()) {
+//            System.out.println("Not present");
+//            tabbedPane1.setSelectedIndex(2);
+//            tabbedPane1.getComponentAt(0).setEnabled(false);
+//            tabbedPane1.getComponentAt(1).setEnabled(false);
+//
+//        }
+//
+//    }
 
     //endregion
 
@@ -163,10 +180,14 @@ public class WikipediaSeperationGUI {
                 .parse(args);
 
         IWikipediaSeparationFacade facade = new WikipediaSeparationFacade();
-        facade.setNeo4jConnection(neo4jArguments);
-
+        try {
+            facade.setNeo4jConnection(neo4jArguments);
+        } catch (ServiceUnavailableException e){
+            System.out.println("WARNING: NO DATABASE CONNECTION ESTABLISHED: PLEASE START UP NEO4J!");
+        }
         WikipediaSeperationGUI gui = new WikipediaSeperationGUI(facade);
         gui.setDefaultLinkArguments(linkArguments);
+
     }
     //endregion
 }
