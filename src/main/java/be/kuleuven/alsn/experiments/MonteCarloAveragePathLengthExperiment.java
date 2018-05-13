@@ -63,7 +63,7 @@ public class MonteCarloAveragePathLengthExperiment {
     private void run() throws IOException {
         PrintWriter totalOutputFile = new PrintWriter(new FileWriter("experiments/block-total.csv"));
         totalOutputFile.write("iteration\ttotal length\taverage length\tamount of no solution found\n");
-        totalOutputFile.flush();;
+        totalOutputFile.flush();
 
         for (int i = 0; i <= communities.size(); i++) {
             if (i > 0) {
