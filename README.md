@@ -214,8 +214,26 @@ CREATE (page1)-[:PART_OF_COM]->(com)
 
 ## Exclude communities of nodes from shortest path
 ```
-MATCH (begin:Page{title: 'Katholieke_Universiteit_Leuven'}), (end:Page{title: 'Adolf_Hitler'}), p = shortestPath((begin)-[:REFERENCES_TO*]->(end)),(com:Community{id:10}),(com2:Community{id: 159}),(com3:Community{id: 1323})
-WHERE NONE(n IN  FILTER(n IN nodes(p) WHERE NOT (n = begin OR n = end)) WHERE (EXISTS((n)-[:PART_OF_COM]->(com)) OR EXISTS((n)-[:PART_OF_COM]->(com2)) OR EXISTS((n)-[:PART_OF_COM]->(com3))))
+MATCH (begin:
+    Page{title:
+        'Katholieke_Universiteit_Leuven'}),
+    (end:Page{title:
+        'Socrates_(filosoof)'}),
+p = shortestPath(
+    (begin)-[:REFERENCES_TO*]->(end)),
+(com1:Community{id: 66}),
+(com2:Community{id: 111304}),
+(com3:Community{id: 204502})
+WHERE NONE(n IN  FILTER(n IN nodes(p)
+    WHERE NOT
+        (n = begin OR n = end))
+    WHERE (EXISTS(
+            (n)-[:PART_OF_COM]->(com1))
+        OR EXISTS(
+            (n)-[:PART_OF_COM]->(com2))
+        OR EXISTS(
+            (n)-[:PART_OF_COM]->(com3))))
+WITH p
 RETURN p
 ```
 Find community of page
