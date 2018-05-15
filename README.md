@@ -184,7 +184,7 @@ cd /dist/lib/
 The SCoDA implementation that was used in this project originated from the [GitHub repository](https://github.com/ahollocou/scoda) of the original author.
 
 ### Defining paramters and input
-The earlier referrenced 'page_links.csv' will be process through the [python script](../blob/master/Python/wiki_edges.py).
+The earlier referrenced 'page_links.csv' will be process through the [python script](../master/Python/wiki_edges.py).
 This script will do the following:
 1. 'input_graph.txt': A tab-separated conversion of page_links.csv
 2. 'MAX_NODE_ID': The node identifier with the highest value
