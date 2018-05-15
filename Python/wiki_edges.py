@@ -65,6 +65,17 @@ def csv_to_txt(input_file: Path):
     return output_file
 
 
+# The input for Neo4j is a csv file
+def txt_to_csv(input_file: Path):
+    output_file = "./output_communities.csv"
+    outfile = open(output_file, 'w')
+    with input_file.open(mode='r') as infile:
+        for line in infile:
+            values = line.split(sep="\t")
+            outfile.write("{},{}\n".format(int(values[0]), int(values[1])))
+    return output_file
+
+
 # Calculate the degree mode for the input into the SCoDA algorithm
 def compute_degree_mode(input_file: Path, max_node_id: int):
     # Index as id maps to degree
@@ -92,5 +103,6 @@ if __name__ == "__main__":
         mode = compute_degree_mode(INPUT_FILE, max_id)
         print("The most occurring degree is {}.".format(str(mode)))
         if COMMUNITIES_FILE.exists():
+            txt_to_csv(COMMUNITIES_FILE)
             overview_communities(COMMUNITIES_FILE, MIN_COM_SIZE)
         plot_incoming_outgoing(INPUT_FILE)
