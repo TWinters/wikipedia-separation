@@ -179,10 +179,25 @@ cd /dist/lib/
 ./dga-graphx louvain -i hdfs://master-ip-address/tmp/dga/louvain/input/page_links.csv -o hdfs://master-ip-address/tmp/dga/louvain/output/ -s /opt/spark -n LouvainModLinks -m spark://spark.master.url:7077 --S spark.executor.memory=30g --ca parallelism=378 --S spark.worker.timeout=400 --S spark.cores.max=126
 ```
 
-### Distributed Graph Analytics
-http://sotera.github.io/distributed-graph-analytics/
+## Streaming Community Detection Algorithm (SCoDA)
 
-http://sotera.github.io/distributed-graph-analytics/louvain/example/graphx/
+The SCoDA implementation that was used in this project originated from the [GitHub repository](https://github.com/ahollocou/scoda) of the original author.
+
+### Defining paramters and input
+The earlier referrenced 'page_links.csv' will be process through the [python script](../blob/master/Python/wiki_edges.py).
+This script will do the following:
+1. 'input_graph.txt': A tab-separated conversion of page_links.csv
+2. 'MAX_NODE_ID': The node identifier with the highest value
+3. 'DEGREE_THRESHOLD': The mode of the degrees of nodes in the graph
+
+### Run the SCoDA algorithm
+Run the minimal C-code algorithm with the following command:
+```
+./scoda MAX_NODE_ID DEGREE_THRESHOLD IGNORE_LINES < input_graph.txt > output_communities.txt
+```
+
+### Post-processing
+Re-run the python script to create an overview file 'overview_communities.csv' of the communities in the graph.
 
 ## Loading the communities into a Graph Database
 
@@ -195,7 +210,6 @@ Then the following commands can be executed in Neo4j:
 ```
 USING PERIODIC COMMIT 500
 LOAD CSV FROM 'file:///overview_communities.csv' AS line
-FIELDTERMINATOR '\t'
 CREATE (com:Community { id: toInteger(line[0])})
 ```
 
@@ -206,7 +220,6 @@ CREATE CONSTRAINT ON (com:Community) ASSERT com.id IS UNIQUE
 ```
 USING PERIODIC COMMIT 500
 LOAD CSV FROM 'file:///output_communities.csv' AS line
-FIELDTERMINATOR '\t'
 MATCH (page1:Page{id: toInteger(line[0])}),
 (com:Community{id: toInteger(line[1])})
 CREATE (page1)-[:PART_OF_COM]->(com)
