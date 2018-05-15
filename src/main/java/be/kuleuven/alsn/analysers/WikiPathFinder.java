@@ -108,13 +108,14 @@ public class WikiPathFinder implements AutoCloseable {
                 IntStream.range(0, blockedCommunities.size())
                         .mapToObj(i -> "(com" + i + ":Community{id:" + blockedCommunities.get(i).getId() + "})")
                         .collect(Collectors.joining(",")) + " " +
-                " WHERE NONE (n IN FILTER (n IN nodes (p) WHERE NOT(n = begin OR n = end)) " +
+                " WHERE NONE (n IN FILTER (n IN nodes (p) "
+                +"WHERE NOT(n = begin OR n = end)) " +
                 " WHERE (" +
                 IntStream.range(0, blockedCommunities.size())
                         .mapToObj(i -> "EXISTS ((n) -[:PART_OF_COM]->(com" + i + "))")
                         .collect(Collectors.joining(" OR "))
                 +
-                ")) RETURN p ";
+                ")) WITH p RETURN p ";
         return query;
     }
 
