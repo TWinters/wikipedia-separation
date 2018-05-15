@@ -7,6 +7,7 @@ import be.kuleuven.alsn.data.WikiPath;
 import be.kuleuven.alsn.facade.IWikipediaSeparationFacade;
 import be.kuleuven.alsn.facade.WikipediaSeparationFacade;
 import com.beust.jcommander.JCommander;
+import org.neo4j.driver.v1.exceptions.ClientException;
 import org.neo4j.driver.v1.exceptions.ServiceUnavailableException;
 
 import java.io.FileWriter;
@@ -55,14 +56,14 @@ public class MonteCarloAveragePathLengthExperiment {
         } catch (ServiceUnavailableException e) {
             System.out.println("WARNING: NO DATABASE CONNECTION ESTABLISHED: PLEASE START UP NEO4J!");
         }
-        MonteCarloAveragePathLengthExperiment experiment = new MonteCarloAveragePathLengthExperiment(facade,COMMUNITIES_OF_LARGEST_MEMBERS);
+        MonteCarloAveragePathLengthExperiment experiment = new MonteCarloAveragePathLengthExperiment(facade, LARGEST_COMMUNITIES);
         experiment.run();
 
     }
 
     private void run() throws IOException {
         PrintWriter totalOutputFile = new PrintWriter(new FileWriter("experiments/block-total.csv"));
-        totalOutputFile.write("iteration\ttotal length\taverage length\tamount of no solution found\n");
+        totalOutputFile.write("iteration\ttotal length\taverage length\tamount of no solution found\tamount of timeouts\n");
         totalOutputFile.flush();
 
         for (int i = 0; i <= communities.size(); i++) {
@@ -73,23 +74,29 @@ public class MonteCarloAveragePathLengthExperiment {
 
             int totalLength = 0;
             int noPathsFound = 0;
+            int timeouts = 0;
 
             for (int j = 0; j < sampleSize; j++) {
 
                 WikiPageCard page1 = facade.getRandomPage();
                 WikiPageCard page2 = facade.getRandomPage();
 
-                Collection<WikiPath> path = facade.calculateShortestPath(page1.getPageName(), page2.getPageName());
-                if (path.isEmpty()) {
-                    j -= 1;
-                    noPathsFound += 1;
-                } else {
-                    int length = path.iterator().next().getPathLength();
-                    totalLength += length;
-                    String output = page1.getPageId() + "\t" + page2.getPageId() + "\t" + length + "\n";
+                try {
+                    Collection<WikiPath> path = facade.calculateShortestPath(page1.getPageName(), page2.getPageName());
 
-                    outputFile.write(output);
-                    outputFile.flush();
+                    if (path.isEmpty()) {
+                        j -= 1;
+                        noPathsFound += 1;
+                    } else {
+                        int length = path.iterator().next().getPathLength();
+                        totalLength += length;
+                        String output = page1.getPageId() + "\t" + page2.getPageId() + "\t" + length + "\n";
+
+                        outputFile.write(output);
+                        outputFile.flush();
+                    }
+                } catch (ClientException e) {
+                    timeouts += 1;
                 }
             }
             outputFile.close();
@@ -98,7 +105,7 @@ public class MonteCarloAveragePathLengthExperiment {
                     i + "\t" +
                             totalLength + "\t" +
                             ((double) totalLength / (double) sampleSize) +
-                            "\t" + noPathsFound + "\n";
+                            "\t" + noPathsFound + "\t" + timeouts+"\n";
             totalOutputFile.write(totalFileOutput);
             totalOutputFile.flush();
 
