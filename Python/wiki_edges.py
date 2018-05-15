@@ -90,7 +90,7 @@ if __name__ == "__main__":
         max_id = find_max_node_id(INPUT_FILE)
         print("The largest found node id is {}.".format(str(max_id)))
         mode = compute_degree_mode(INPUT_FILE, max_id)
+        print("The most occurring degree is {}.".format(str(mode)))
         if COMMUNITIES_FILE.exists():
-            print("The most occurring degree is {}.".format(str(mode)))
             overview_communities(COMMUNITIES_FILE, MIN_COM_SIZE)
         plot_incoming_outgoing(INPUT_FILE)
