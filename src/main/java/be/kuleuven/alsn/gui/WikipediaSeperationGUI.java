@@ -11,6 +11,8 @@ import org.neo4j.driver.v1.exceptions.AuthenticationException;
 import org.neo4j.driver.v1.exceptions.ServiceUnavailableException;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Collection;
 
 public class WikipediaSeperationGUI {
@@ -26,6 +28,8 @@ public class WikipediaSeperationGUI {
     private JPasswordField txtNeo4jPassword;
     private JButton updateConnectionButton;
     private JButton viewCommunityButton;
+    private JButton btnRandomFrom;
+    private JButton btnRandomTo;
 
     //region Initialisation
     private final IWikipediaSeparationFacade facade;
@@ -49,6 +53,8 @@ public class WikipediaSeperationGUI {
         viewCommunityButton.addActionListener(x->openSelectedCommunities());
 
 //        checkNeo4jConnection();
+        btnRandomFrom.addActionListener(x-> txtFrom.setText(facade.getRandomPage().getPageName()));
+        btnRandomTo.addActionListener(x-> txtTo.setText(facade.getRandomPage().getPageName()));
     }
 
 
