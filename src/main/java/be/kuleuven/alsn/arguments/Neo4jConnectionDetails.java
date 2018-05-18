@@ -22,7 +22,7 @@ public class Neo4jConnectionDetails {
     }
 
     public Neo4jConnectionDetails() {
-        this("bolt://localhost:7687", "neo4j", "admin");
+        this("bolt://localhost:11002", "neo4j", "admin");
     }
 
 
