@@ -23,4 +23,6 @@ public interface IWikipediaSeparationFacade extends IWikipediaCommunityFacade {
     boolean isValidPage(String page);
 
     WikiPageCard getRandomPage();
+
+    void setPageRandomiserSeed(Long aLong);
 }

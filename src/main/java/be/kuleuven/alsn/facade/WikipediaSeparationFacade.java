@@ -90,5 +90,10 @@ public class WikipediaSeparationFacade implements IWikipediaSeparationFacade {
         return pageSampler.getRandomPage();
     }
 
+    @Override
+    public void setPageRandomiserSeed(Long seed) {
+        pageSampler.setRandomiserSeed(seed);
+    }
+
     /* endregion */
 }
