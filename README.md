@@ -1,16 +1,13 @@
 # wikipedia-separation
 Project for the KU Leuven course *Analysis of Large Scale Social Networks*. 
 
-## Report link
-https://www.sharelatex.com/9129584415ppwrymrvnpnc
-
 ## Setting up
 
 ### Required programs
 * [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) or higher to run the code
 * [InteliJ IDEA](https://www.jetbrains.com/idea/) to edit, load, compile the code.
 Load the repository by opening the build.gradle file in IntelliJ, which will load all of the dependencies (e.g. Spark, GraphX etc)
-* A MySQL server, e.g. [WAMP](http://www.wampserver.com/en/)
+* A MySQL server, e.g. [WAMP](http://www.wampserver.com/en/) or [MySQL Community Server](https://dev.mysql.com/downloads/mysql/)
 * A program to run MySQL queries on the MySQL database (e.g. [MySQL Workbench](https://www.mysql.com/products/workbench/)).
 This program is used to create the CSV file required by the graph database.
 * [Neo4J](https://neo4j.com/) to run the graph database which stores all wikipedia data used in this program.
@@ -111,6 +108,32 @@ MATCH (page1:Page{id: toInteger(line[0])}),(page2:Page{id: toInteger(line[1])})
 CREATE (page1)-[:REFERENCES_TO]->(page2)
 ```
 
+### Loading the communities into a Graph Database
+
+The following files from the `Python` folder have to be added to `\.Neo4jDesktop\neo4jDatabases\database-[database_identifier_code]\installation-3.3.4\import`:
+* overview_communities.csv
+* output_communities.csv
+
+Then the following commands can be executed in Neo4j:
+
+```
+USING PERIODIC COMMIT 500
+LOAD CSV FROM 'file:///overview_communities.csv' AS line
+CREATE (com:Community { id: toInteger(line[0])})
+```
+
+```
+CREATE CONSTRAINT ON (com:Community) ASSERT com.id IS UNIQUE
+```
+
+```
+USING PERIODIC COMMIT 500
+LOAD CSV FROM 'file:///output_communities.csv' AS line
+MATCH (page1:Page{id: toInteger(line[0])}),
+(com:Community{id: toInteger(line[1])})
+CREATE (page1)-[:PART_OF_COM]->(com)
+```
+
 ## Running the program
 
 ### Basic shortest path between pages
@@ -128,12 +151,13 @@ This program requires several arguments given with the command line, namely:
 For example, possible program arguments are:
 `-db_login neo4j -db_pw admin -from Katholieke_Universiteit_Leuven -to Adolf_Hitler`
 
+## Appendix
 
-## Louvain Modularity
-To find communities within the Dutch wikipedia dataset we'll be using Louvain Modularity.
-Due to the size of our dataset this will be done in a distributed fashion with the help of Amazon Web Service EMR.
+### Louvain Modularity
+To find communities within the Dutch wikipedia dataset we looked at using the Louvain Modularity.
+Due to the size of our dataset this would have been done in a distributed fashion with the help of Amazon Web Service EMR.
 
-### Creating a Spark cluster on AWS EMR
+#### Creating a Spark cluster on AWS EMR
 When creating a cluster quickly the software required to run the Sotera code that we are utilizing is:
 ```
 Spark: Spark 2.3.0 on Hadoop 2.8.3 YARN with Ganglia 3.7.2 and Zeppelin 0.7.3
@@ -144,7 +168,7 @@ https://aws.amazon.com/blogs/aws/new-apache-spark-on-amazon-emr/
 
 https://docs.aws.amazon.com/emr/latest/ReleaseGuide/emr-spark.html
 
-### Setting up
+#### Setting up
 To avoid a common port issue, you can use to following steps.
 
     1. Go to EC2 console
@@ -179,87 +203,23 @@ cd /dist/lib/
 ./dga-graphx louvain -i hdfs://master-ip-address/tmp/dga/louvain/input/page_links.csv -o hdfs://master-ip-address/tmp/dga/louvain/output/ -s /opt/spark -n LouvainModLinks -m spark://spark.master.url:7077 --S spark.executor.memory=30g --ca parallelism=378 --S spark.worker.timeout=400 --S spark.cores.max=126
 ```
 
-## Streaming Community Detection Algorithm (SCoDA)
+### Streaming Community Detection Algorithm (SCoDA)
 
 The SCoDA implementation that was used in this project originated from the [GitHub repository](https://github.com/ahollocou/scoda) of the original author.
+You can rerun this algorithm to create new communities with other sizes.
 
-### Defining paramters and input
+#### Defining paramters and input
 The earlier referrenced 'page_links.csv' will be process through the [python script](../master/Python/wiki_edges.py).
 This script will do the following:
 1. 'input_graph.txt': A tab-separated conversion of page_links.csv
 2. 'MAX_NODE_ID': The node identifier with the highest value
 3. 'DEGREE_THRESHOLD': The mode of the degrees of nodes in the graph
 
-### Run the SCoDA algorithm
+#### Run the SCoDA algorithm
 Run the minimal C-code algorithm with the following command:
 ```
 ./scoda MAX_NODE_ID DEGREE_THRESHOLD IGNORE_LINES < input_graph.txt > output_communities.txt
 ```
 
-### Post-processing
+#### Post-processing
 Re-run the python script to create an overview file 'overview_communities.csv' of the communities in the graph.
-
-## Loading the communities into a Graph Database
-
-The following files from the `Python` folder have to be added to `\.Neo4jDesktop\neo4jDatabases\database-[database_identifier_code]\installation-3.3.4\import`:
-* overview_communities.csv
-* output_communities.csv
-
-Then the following commands can be executed in Neo4j:
-
-```
-USING PERIODIC COMMIT 500
-LOAD CSV FROM 'file:///overview_communities.csv' AS line
-CREATE (com:Community { id: toInteger(line[0])})
-```
-
-```
-CREATE CONSTRAINT ON (com:Community) ASSERT com.id IS UNIQUE
-```
-
-```
-USING PERIODIC COMMIT 500
-LOAD CSV FROM 'file:///output_communities.csv' AS line
-MATCH (page1:Page{id: toInteger(line[0])}),
-(com:Community{id: toInteger(line[1])})
-CREATE (page1)-[:PART_OF_COM]->(com)
-```
-
-## Exclude communities of nodes from shortest path
-```
-MATCH (begin:
-    Page{title:
-        'Katholieke_Universiteit_Leuven'}),
-    (end:Page{title:
-        'Socrates_(filosoof)'}),
-p = shortestPath(
-    (begin)-[:REFERENCES_TO*]->(end)),
-(com1:Community{id: 66}),
-(com2:Community{id: 111304}),
-(com3:Community{id: 204502})
-WHERE NONE(n IN  FILTER(n IN nodes(p)
-    WHERE NOT
-        (n = begin OR n = end))
-    WHERE (EXISTS(
-            (n)-[:PART_OF_COM]->(com1))
-        OR EXISTS(
-            (n)-[:PART_OF_COM]->(com2))
-        OR EXISTS(
-            (n)-[:PART_OF_COM]->(com3))))
-WITH p
-RETURN p
-```
-Find community of page
-```
-MATCH (page:Page{title: 'Tweede_Wereldoorlog'})-[:PART_OF_COM]->(c)
-RETURN c
-```
-
-Find all nodes of a community and their number of incoming links
-```
-MATCH (com:Community{id:9}), (n:Page), (o:Page),(n)-[:PART_OF_COM]->(com), s = (o)-[:REFERENCES_TO]->(n) 
-WITH n, COUNT(s) AS number 
-ORDER BY number DESC 
-RETURN n,number
-```
-
