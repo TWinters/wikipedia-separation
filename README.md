@@ -1,5 +1,7 @@
 # wikipedia-separation
-Project for the KU Leuven course *Analysis of Large Scale Social Networks*. 
+This project aims to help calculating the shortest paths between Wikipedia pages (and thus its degree of separation) using a Neo4j graph database.
+We also employ community detection to enable the program to block certain communities to appear in found paths.
+This project was created for the KU Leuven course *Analysis of Large Scale Social Networks*. 
 
 ## Setting up
 
@@ -137,8 +139,8 @@ CREATE (page1)-[:PART_OF_COM]->(com)
 ## Running the program
 
 ### Basic shortest path between pages
-To find the shortest path between two wikipedia pages, the class `WikipediaLinksFinder` can be run.
-This program requires several arguments given with the command line, namely:
+To find the shortest path between two wikipedia pages, the main method of `WikipediaSeparationGUI` can be run.
+This program can be given several arguments using the command line to instantiate default parameters, namely:
 
 | Argument               | Description               |
 | ---------------------- | ------------------------- |
@@ -149,7 +151,9 @@ This program requires several arguments given with the command line, namely:
 | -to | The goal Wikipedia page to end on and find the shortest path to.  |
 
 For example, possible program arguments are:
-`-db_login neo4j -db_pw admin -from Katholieke_Universiteit_Leuven -to Adolf_Hitler`
+`-db_login neo4j -db_pw admin -from Katholieke_Universiteit_Leuven -to Socrates_(filosoof)`
+Mainly the first three parameters will be important when running your own Neo4j database.
+
 
 ## Appendix
 
