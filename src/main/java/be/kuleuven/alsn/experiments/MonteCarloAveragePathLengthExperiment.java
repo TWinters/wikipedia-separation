@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,14 +32,15 @@ public class MonteCarloAveragePathLengthExperiment {
             .collect(Collectors.toList());
 
 
-    private final int sampleSize = 100;
+    private final int sampleSize;
     private final List<WikiCommunityToken> communities;
 
     private final IWikipediaSeparationFacade facade;
 
-    public MonteCarloAveragePathLengthExperiment(IWikipediaSeparationFacade facade, List<WikiCommunityToken> communities) {
+    public MonteCarloAveragePathLengthExperiment(IWikipediaSeparationFacade facade, List<WikiCommunityToken> communities, int sampleSize) {
         this.facade = facade;
         this.communities = communities;
+        this.sampleSize = sampleSize;
 
     }
 
@@ -56,12 +58,16 @@ public class MonteCarloAveragePathLengthExperiment {
         } catch (ServiceUnavailableException e) {
             System.out.println("WARNING: NO DATABASE CONNECTION ESTABLISHED: PLEASE START UP NEO4J!");
         }
-        MonteCarloAveragePathLengthExperiment experiment = new MonteCarloAveragePathLengthExperiment(facade, LARGEST_COMMUNITIES);
+        MonteCarloAveragePathLengthExperiment experiment = new MonteCarloAveragePathLengthExperiment(facade, LARGEST_COMMUNITIES, 1000);
         experiment.run();
 
     }
 
     private void run() throws IOException {
+        run(Optional.empty());
+    }
+
+    private void run(Optional<Long> seed) throws IOException {
         PrintWriter totalOutputFile = new PrintWriter(new FileWriter("experiments/block-total.csv"));
         totalOutputFile.write("iteration\ttotal length\taverage length\tamount of no solution found\tamount of timeouts\n");
         totalOutputFile.flush();
@@ -75,6 +81,10 @@ public class MonteCarloAveragePathLengthExperiment {
             int totalLength = 0;
             int noPathsFound = 0;
             int timeouts = 0;
+
+            if (seed.isPresent()) {
+                facade.setPageRandomiserSeed(seed.get());
+            }
 
             for (int j = 0; j < sampleSize; j++) {
 
