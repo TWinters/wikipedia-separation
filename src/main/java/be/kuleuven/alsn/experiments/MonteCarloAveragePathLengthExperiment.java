@@ -58,8 +58,8 @@ public class MonteCarloAveragePathLengthExperiment {
         } catch (ServiceUnavailableException e) {
             System.out.println("WARNING: NO DATABASE CONNECTION ESTABLISHED: PLEASE START UP NEO4J!");
         }
-        MonteCarloAveragePathLengthExperiment experiment = new MonteCarloAveragePathLengthExperiment(facade, LARGEST_COMMUNITIES, 1000);
-        experiment.run();
+        MonteCarloAveragePathLengthExperiment experiment = new MonteCarloAveragePathLengthExperiment(facade, COMMUNITIES_OF_LARGEST_MEMBERS, 100);
+        experiment.run(Optional.of(123L));
 
     }
 
