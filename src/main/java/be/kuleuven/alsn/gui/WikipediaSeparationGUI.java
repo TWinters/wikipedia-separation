@@ -11,11 +11,9 @@ import org.neo4j.driver.v1.exceptions.AuthenticationException;
 import org.neo4j.driver.v1.exceptions.ServiceUnavailableException;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Collection;
 
-public class WikipediaSeperationGUI {
+public class WikipediaSeparationGUI {
     private JTextField txtFrom;
     private JTextField txtTo;
     private JList<WikiCommunity> lstClusterBlacklist;
@@ -34,7 +32,7 @@ public class WikipediaSeperationGUI {
     //region Initialisation
     private final IWikipediaSeparationFacade facade;
 
-    public WikipediaSeperationGUI(IWikipediaSeparationFacade facade) {
+    public WikipediaSeparationGUI(IWikipediaSeparationFacade facade) {
         this.facade = facade;
 
         // Setting connections
@@ -191,7 +189,7 @@ public class WikipediaSeperationGUI {
         } catch (ServiceUnavailableException e){
             System.out.println("WARNING: NO DATABASE CONNECTION ESTABLISHED: PLEASE START UP NEO4J!");
         }
-        WikipediaSeperationGUI gui = new WikipediaSeperationGUI(facade);
+        WikipediaSeparationGUI gui = new WikipediaSeparationGUI(facade);
         gui.setDefaultLinkArguments(linkArguments);
 
     }
