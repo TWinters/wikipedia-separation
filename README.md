@@ -1,6 +1,6 @@
 # Wikipedia-separation: Degree of Separation on Wikipedia
 This project aims to help calculating the shortest paths between Wikipedia pages (and thus its degree of separation) using a Neo4j graph database.
-We also employ community detection to enable the program to block certain communities to appear in found paths.
+We also employ community detection to enable the program to block certain less interesting communities to appear in the found paths.
 This project was created for the KU Leuven course *Analysis of Large Scale Social Networks*. 
 
 ## Setting up
@@ -114,7 +114,7 @@ CREATE (page1)-[:REFERENCES_TO]->(page2)
 
 The SCoDA implementation that was used in this project originated from the [GitHub repository](https://github.com/ahollocou/scoda) of the original author.
 We have already provided calculated communities in the `Python` folder of this repository.
-You can however rerun this algorithm to create your own new communities with other sizes.
+You can however rerun this algorithm to create your own new communities with different sizes.
 
 #### Defining paramters and input
 The earlier referrenced 'page_links.csv' will be process through the [python script](../master/Python/wiki_edges.py).
