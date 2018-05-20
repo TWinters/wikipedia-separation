@@ -23,16 +23,16 @@ and download `nlwiki-20180320-page.sql.gz` as well as `nlwiki-20180320-pagelinks
 To download the data dump of another language and/or date, replace _nlwiki_ and the date in the file names.
 
 These three files each contain a data table in SQL:
-* _page_: a collection of all the pages on Wikipedia. Has columns containing id, namespace, title, etc. It also contains
-some columns with booleans like _is_redirect_ to indicate if a page is a redirect page or not.
-* _pagelinks_: a collection of all the links between pages on Wikipedia.
-* _redirect_: a collection with the redirect targets of all redirect pages. When a page is a redirect page, this table is
+* `page`: a collection of all the pages on Wikipedia. Has columns containing id, namespace, title, etc. It also contains
+some columns with booleans like `is_redirect` to indicate if a page is a redirect page or not.
+* `pagelinks`: a collection of all the links between pages on Wikipedia.
+* `redirect`: a collection with the redirect targets of all redirect pages. When a page is a redirect page, this table is
 used to extract the redirect target.
 
-Both _page_ and _pagelinks_ will be used in Neo4j but have to be preprocessed and converted to CSV files first.
+Both `page` and `pagelinks` will be used in Neo4j but have to be preprocessed and converted to CSV files first.
 To create the right CSV files, import all three SQL files into a MySQL database, and use a program such as MySQL Workbench.
 
-An intermediary table _pagelinks_with_rd_ will be created. In this table only pages with namespace 0 will be used and every
+An intermediary table `pagelinks_with_rd` will be created. In this table only pages with namespace 0 will be used and every
 occurrence of a redirect page will be replace by its redirect target. In order to create this table, use the following query:
 ```
 CREATE TABLE nlwiki.pagelinks_with_rd AS
@@ -57,7 +57,7 @@ INNER JOIN
     ON p2.page_title = temp2.page_title
 ```
 This query first does a left on a filtered page table (with namespace 0) and the redirect table. Then an inner join is used
-on this table and the pagelinks table. The pagelinks then contains links in which each target is the original one or a
+on this table and the `pagelinks` table. The `pagelinks` then contains links in which each target is the original one or a
 replaced one if the original one was a redirect. To store this table in CSV format, use the next query:
 ````
 SELECT * 
@@ -119,9 +119,9 @@ You can however rerun this algorithm to create your own new communities with dif
 #### Defining paramters and input
 The earlier referrenced 'page_links.csv' will be process through the [python script](../master/Python/wiki_edges.py).
 This script will do the following:
-1. 'input_graph.txt': A tab-separated conversion of page_links.csv
-2. 'MAX_NODE_ID': The node identifier with the highest value
-3. 'DEGREE_THRESHOLD': The mode of the degrees of nodes in the graph
+1. `input_graph.txt`: A tab-separated conversion of page_links.csv
+2. `MAX_NODE_ID`: The node identifier with the highest value
+3. `DEGREE_THRESHOLD`: The mode of the degrees of nodes in the graph
 
 #### Run the SCoDA algorithm
 Run the minimal C-code algorithm with the following command:
@@ -136,8 +136,8 @@ Re-run the python script to create an overview file 'overview_communities.csv' o
 ### Loading the communities into a Graph Database
 
 The following files from the `Python` folder have to be added to `\.Neo4jDesktop\neo4jDatabases\database-[database_identifier_code]\installation-3.3.4\import`:
-* overview_communities.csv
-* output_communities.csv
+* `overview_communities.csv`
+* `output_communities.csv`
 
 Then the following commands can be executed in Neo4j:
 
@@ -167,11 +167,11 @@ This program can be given several arguments using the command line to instantiat
 
 | Argument               | Description               |
 | ---------------------- | ------------------------- |
-| -db_url | The url where the Neo4J database containing the Wikipedia links is running. Default value: `bolt://localhost:7687` |
-| -db_login | The login name of the Neo4J database. |
-| -db_pw | The password of the Neo4J database. |
-| -from | The Wikipedia page to start from. |
-| -to | The goal Wikipedia page to end on and find the shortest path to.  |
+| `-db_url` | The url where the Neo4J database containing the Wikipedia links is running. Default value: `bolt://localhost:7687` |
+| `-db_login` | The login name of the Neo4J database. |
+| `-db_pw` | The password of the Neo4J database. |
+| `-from` | The Wikipedia page to start from. |
+| `-to` | The goal Wikipedia page to end on and find the shortest path to.  |
 
 For example, possible program arguments are:
 `-db_login neo4j -db_pw admin -from Katholieke_Universiteit_Leuven -to Socrates_(filosoof)`
