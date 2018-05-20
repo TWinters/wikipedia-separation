@@ -13,10 +13,10 @@ import java.util.Collection;
 public class LinksFinderArguments {
 
     @Parameter(names = "-from", description = "The wikipedia page to start from")
-    private String from = "Katholieke_Universiteit_Leuven";
+    private String from = "";
 
     @Parameter(names = "-to", description = "The goal wikipedia page to end on")
-    private String to = "Adolf_Hitler";
+    private String to = "";
 
     @Parameter(names = "-blocked", description = "Communities of which nodes are not allowed to appear on the path")
     private Collection<WikiCommunityToken> blockedCommunities = new ArrayList<>();

@@ -174,6 +174,6 @@ This program can be given several arguments using the command line to instantiat
 | `-to` | The goal Wikipedia page to end on and find the shortest path to.  |
 
 For example, possible program arguments are:
-`-db_login neo4j -db_pw admin -from Katholieke_Universiteit_Leuven -to Socrates_(filosoof)`
+`-db_login neo4j -db_pw admin  -db_url bolt://localhost:11002 -from Katholieke_Universiteit_Leuven -to Socrates_(filosoof)`
 Mainly the first three parameters will be important when running your own Neo4j database.
 
