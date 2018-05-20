@@ -12,8 +12,7 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile 'com.google.guava:guava:11.0.2'
-
-    compile 'neo4j-contrib:neo4j-spark-connector:2.1.0-M4'
+    compile group: 'org.neo4j.driver', name: 'neo4j-java-driver', version: '1.6.1'
     compile group: 'org.neo4j', name: 'neo4j-kernel', version: '3.3.4'
     testCompile group: 'org.neo4j', name: 'neo4j-common', version: '3.3.4'
 
