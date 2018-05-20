@@ -87,6 +87,7 @@ public class WikipediaPathViewer {
         boolean isBlocked = communityFacade.isBlocked(communityFacade.getCommunityOf(lstPath.getSelectedValue()));
         blockPageCommunityButton.setEnabled(!lstPath.isSelectionEmpty() && !isBlocked);
         unblockPageCommunityButton.setEnabled(!lstPath.isSelectionEmpty() && isBlocked);
+        viewCommunitiesButton.setEnabled(!lstPath.isSelectionEmpty());
     }
 
     private void updateSelected(ListSelectionEvent listSelectionEvent) {
