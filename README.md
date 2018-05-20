@@ -1,4 +1,4 @@
-# wikipedia-separation
+# Wikipedia-separation: Degree of Separation on Wikipedia
 This project aims to help calculating the shortest paths between Wikipedia pages (and thus its degree of separation) using a Neo4j graph database.
 We also employ community detection to enable the program to block certain communities to appear in found paths.
 This project was created for the KU Leuven course *Analysis of Large Scale Social Networks*. 
