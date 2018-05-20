@@ -110,6 +110,29 @@ MATCH (page1:Page{id: toInteger(line[0])}),(page2:Page{id: toInteger(line[1])})
 CREATE (page1)-[:REFERENCES_TO]->(page2)
 ```
 
+### OPTIONAL: Streaming Community Detection Algorithm (SCoDA)
+
+The SCoDA implementation that was used in this project originated from the [GitHub repository](https://github.com/ahollocou/scoda) of the original author.
+We have already provided calculated communities in the `Python` folder of this repository.
+You can however rerun this algorithm to create your own new communities with other sizes.
+
+#### Defining paramters and input
+The earlier referrenced 'page_links.csv' will be process through the [python script](../master/Python/wiki_edges.py).
+This script will do the following:
+1. 'input_graph.txt': A tab-separated conversion of page_links.csv
+2. 'MAX_NODE_ID': The node identifier with the highest value
+3. 'DEGREE_THRESHOLD': The mode of the degrees of nodes in the graph
+
+#### Run the SCoDA algorithm
+Run the minimal C-code algorithm with the following command:
+```
+./scoda MAX_NODE_ID DEGREE_THRESHOLD IGNORE_LINES < input_graph.txt > output_communities.txt
+```
+
+#### Post-processing
+Re-run the python script to create an overview file 'overview_communities.csv' of the communities in the graph.
+
+
 ### Loading the communities into a Graph Database
 
 The following files from the `Python` folder have to be added to `\.Neo4jDesktop\neo4jDatabases\database-[database_identifier_code]\installation-3.3.4\import`:
@@ -154,26 +177,3 @@ For example, possible program arguments are:
 `-db_login neo4j -db_pw admin -from Katholieke_Universiteit_Leuven -to Socrates_(filosoof)`
 Mainly the first three parameters will be important when running your own Neo4j database.
 
-
-## Appendix
-
-### Streaming Community Detection Algorithm (SCoDA)
-
-The SCoDA implementation that was used in this project originated from the [GitHub repository](https://github.com/ahollocou/scoda) of the original author.
-You can rerun this algorithm to create your own new communities with other sizes.
-
-#### Defining paramters and input
-The earlier referrenced 'page_links.csv' will be process through the [python script](../master/Python/wiki_edges.py).
-This script will do the following:
-1. 'input_graph.txt': A tab-separated conversion of page_links.csv
-2. 'MAX_NODE_ID': The node identifier with the highest value
-3. 'DEGREE_THRESHOLD': The mode of the degrees of nodes in the graph
-
-#### Run the SCoDA algorithm
-Run the minimal C-code algorithm with the following command:
-```
-./scoda MAX_NODE_ID DEGREE_THRESHOLD IGNORE_LINES < input_graph.txt > output_communities.txt
-```
-
-#### Post-processing
-Re-run the python script to create an overview file 'overview_communities.csv' of the communities in the graph.
